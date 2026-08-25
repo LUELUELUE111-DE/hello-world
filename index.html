@@ -1,0 +1,248 @@
+<!DOCTYPE html>
+<html lang="zh-CN">
+<head>
+<meta charset="UTF-8">
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>人生切片胶囊 · 封存 | 读取</title>
+<style>
+  :root { --ink:#2b2b2b; --paper:#faf7f2; --accent:#8a5a3b; --muted:#9a8f84; }
+  * { box-sizing:border-box; margin:0; padding:0; }
+  body { font-family:"PingFang SC","Microsoft YaHei",system-ui,sans-serif; background:var(--paper); color:var(--ink); height:100vh; display:flex; flex-direction:column; }
+  header { padding:12px 20px; border-bottom:1px solid #e6dfd5; background:#fffdfa; }
+  header h1 { font-size:17px; letter-spacing:1px; color:var(--accent); }
+  .tabs { display:flex; gap:8px; margin-top:8px; }
+  .tabs button { padding:7px 18px; border:1px solid #e6dfd5; border-radius:20px; background:#fff; color:var(--accent); cursor:pointer; font-size:14px; }
+  .tabs button.active { background:var(--accent); color:#fff; border-color:var(--accent); }
+  .subtitle { font-size:12px; color:var(--muted); margin-top:6px; }
+
+  .view { flex:1; display:flex; flex-direction:column; min-height:0; }
+
+  /* 封存模式 */
+  #chat { flex:1; overflow-y:auto; padding:20px; display:flex; flex-direction:column; gap:14px; }
+  .msg { max-width:78%; padding:11px 14px; border-radius:14px; font-size:14px; line-height:1.6; white-space:pre-wrap; word-break:break-word; }
+  .user { align-self:flex-end; background:var(--accent); color:#fff; border-bottom-right-radius:4px; }
+  .assistant { align-self:flex-start; background:#fff; border:1px solid #e6dfd5; border-bottom-left-radius:4px; box-shadow:0 1px 3px rgba(0,0,0,.04); }
+  .sys { align-self:center; background:#f0ebe2; color:var(--accent); font-size:12px; border-radius:8px; padding:6px 12px; max-width:90%; }
+
+  /* 读取模式 */
+  #readView { flex-direction:row; }
+  #capsuleList { width:250px; border-right:1px solid #e6dfd5; overflow-y:auto; padding:14px; background:#fffdfa; flex:none; }
+  #capsuleList h3 { font-size:13px; color:var(--muted); margin-bottom:10px; }
+  .cap { padding:11px 12px; border:1px solid #e6dfd5; border-radius:10px; background:#fff; cursor:pointer; margin-bottom:10px; transition:.15s; }
+  .cap:hover { border-color:var(--accent); }
+  .cap.active { border-color:var(--accent); background:#f4ede4; }
+  .cap .ta { font-size:13px; font-weight:600; color:var(--accent); }
+  .cap .id { font-size:11px; color:var(--muted); margin-top:3px; word-break:break-all; }
+  .cap .sum { font-size:12px; color:var(--ink); margin-top:5px; line-height:1.4; }
+  .empty2 { color:var(--muted); font-size:13px; padding:20px 10px; text-align:center; line-height:1.6; }
+  #readChat { flex:1; display:flex; flex-direction:column; min-height:0; }
+  #readChat .placeholder { color:var(--muted); text-align:center; font-size:13px; margin-top:60px; line-height:1.8; }
+
+  footer { padding:14px 16px; border-top:1px solid #e6dfd5; background:#fffdfa; }
+  .bar { display:flex; gap:10px; align-items:flex-end; }
+  #mic { width:46px; height:46px; border-radius:50%; border:none; background:#ddd; color:#666; font-size:20px; cursor:pointer; flex:none; transition:.2s; }
+  #mic.recording { background:#c0392b; color:#fff; box-shadow:0 0 0 5px rgba(192,57,43,.18); }
+  #input { flex:1; resize:none; border:1px solid #e6dfd5; border-radius:12px; padding:12px 14px; font-size:14px; font-family:inherit; outline:none; background:#fff; max-height:120px; }
+  #input:focus { border-color:var(--accent); }
+  #send { padding:10px 20px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-size:15px; cursor:pointer; flex:none; }
+  .hint { font-size:11px; color:var(--muted); margin-top:8px; text-align:center; }
+  .session { font-size:11px; color:var(--muted); text-align:center; margin-top:4px; }
+</style>
+</head>
+<body>
+<header>
+  <div style="display:flex; align-items:baseline; justify-content:space-between;">
+    <h1>🕰️ 人生切片胶囊</h1>
+    <div class="tabs">
+      <button id="tabSeal" class="active">封存此刻</button>
+      <button id="tabRead">读取过去</button>
+    </div>
+  </div>
+  <p class="subtitle" id="subtitle">与认知考古学家深度对话 · 把此刻真实的你封存成胶囊</p>
+</header>
+
+<!-- 封存模式视窗 -->
+<div class="view" id="sealView">
+  <div id="chat">
+    <div class="msg assistant">你好，我是你的认知考古学家。今天想封存此刻的哪一个画面、哪一段心事？你可以用文字，也可以按住下面麦克风用语音告诉我。（录音会自动识别成文字）</div>
+  </div>
+</div>
+
+<!-- 读取模式视窗 -->
+<div class="view" id="readView" style="display:none;">
+  <div id="capsuleList">
+    <h3>📦 已封存的胶囊</h3>
+    <div id="capItems"><div class="empty2">加载中…</div></div>
+  </div>
+  <div id="readChat">
+    <div class="placeholder" id="readPlaceholder">从左侧选择一个已封存的胶囊，<br>「过去的你」会重新开口和你说话。</div>
+  </div>
+</div>
+
+<footer>
+  <div class="bar">
+    <button id="mic" title="语音输入">🎙️</button>
+    <textarea id="input" rows="1" placeholder="输入，或点击麦克风开始实时语音…"></textarea>
+    <button id="send">发送</button>
+  </div>
+  <div class="hint">🎙️ 点击麦克风开始实时语音识别（浏览器会实时转成文字自动填入），再点一次停止。</div>
+  <div class="session" id="sessionLabel">会话ID：生成中…</div>
+</footer>
+
+<script>
+  const chatEl = document.getElementById('chat');
+  const inputEl = document.getElementById('input');
+  const micBtn  = document.getElementById('mic');
+  const sendBtn = document.getElementById('send');
+  const sessionLabel = document.getElementById('sessionLabel');
+  const subtitle = document.getElementById('subtitle');
+  const sealView = document.getElementById('sealView');
+  const readView = document.getElementById('readView');
+  const capItems = document.getElementById('capItems');
+  const readChat = document.getElementById('readChat');
+  const readPlaceholder = document.getElementById('readPlaceholder');
+
+  // 模式：seal / read
+  let mode = 'seal';
+  // 封存会话
+  // 固定的用户身份锚点：跨会话、跨刷新保持不变，用于区分/关联同一个测试者
+  let capsuleUid = localStorage.getItem('capsule_uid');
+  if (!capsuleUid) { capsuleUid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(16).slice(2,10); localStorage.setItem('capsule_uid', capsuleUid); }
+  let sealSession = localStorage.getItem('capsule_seal_session');
+  if (!sealSession) { sealSession = 'seal_' + Date.now() + '_' + Math.random().toString(16).slice(2,8); localStorage.setItem('capsule_seal_session', sealSession); }
+  // 当前读取会话（切换胶囊时重建）
+  let readSession = 'read_' + Date.now() + '_' + Math.random().toString(16).slice(2,8);
+  let currentCapsule = null;
+
+  // ===================== 部署配置（远程直连时填写）=====================
+  // API_BASE：留空 = 同源(随 main.py 部署)；填写 .coze.site 域名(如 https://xxx.coze.site) = 前端单独托管远程直连
+  const API_BASE = 'https://6kmyk9zfbd.coze.site/';
+  // API_TOKEN：同源时留空；远程直连时填部署页创建的 API Token（测试期请用受限 scope 的 token，勿用主账号）
+  const API_TOKEN = 'eyJhbGciOiJSUzI1NiIsImtpZCI6IjkxZTI1MzNmLTllZTgtNDdhYS04NDA4LTdjYzgyYmYyNmRkYyJ9.eyJpc3MiOiJodHRwczovL2FwaS5jb3plLmNuIiwiYXVkIjpbImJ2WnR3T1M0UU11YVIxZUJ6VFBnMk1BaW5KS3RHdmZyIl0sImV4cCI6ODIxMDI2Njg3Njc5OSwiaWF0IjoxNzg3NjYzMjA0LCJzdWIiOiJzcGlmZmU6Ly9hcGkuY296ZS5jbi93b3JrbG9hZF9pZGVudGl0eS9pZDo3Njc3NTYyNDA0Mzc2NDEyMjExIiwic3JjIjoiaW5ib3VuZF9hdXRoX2FjY2Vzc190b2tlbl9pZDo3Njc3OTU0OTk4NDMyNDMyMTYyIn0.ARUBPSMV8J5_fpm4GwiZyf8n1N1ShaI6DU2Nhs-2bdmr-CIYGjr1KXP5otGKOrlzxAr3asIvcIF5_kOhkZwHiNE8OZyY1eVAwuM8GJTjTg_o4w9QqhB4FvTlFaMBbogsh4ONCXNojc0SIxT0qnZONbd4Jx-OXSeHyUBuL71cMzoG62LE0VJJEJk-HgM27IXTtmEjYK4tm_JWC0812CbVHUlvzVkj582DBW90IkTt3VOqfxUhH5gOhHL3d3lgtC4y11yKfvP4kKqC-EhPCRl3uLlijf1LlYu2QaXfrRs0OArmlMf5wMh8YLHkghTYNhFKt9kSq5C9lfYmB4BI1FfnZw';
+  function authHeaders(extra) {
+    const h = Object.assign({}, extra || {});
+    h['x-coze-user-id'] = capsuleUid;
+    if (API_TOKEN) h['Authorization'] = 'Bearer ' + API_TOKEN;
+    return h;
+  }
+
+  function currentSession(){ return mode==='seal' ? sealSession : (readSession + (currentCapsule?'_' + currentCapsule:'')); }
+  function refreshLabel(){ sessionLabel.textContent = '会话ID：' + currentSession(); }
+
+  // ---------- 模式切换 ----------
+  document.getElementById('tabSeal').onclick = () => switchMode('seal');
+  document.getElementById('tabRead').onclick = () => switchMode('read');
+
+  function switchMode(m){
+    mode = m;
+    document.getElementById('tabSeal').classList.toggle('active', m==='seal');
+    document.getElementById('tabRead').classList.toggle('active', m==='read');
+    sealView.style.display = m==='seal' ? 'flex' : 'none';
+    readView.style.display  = m==='read' ? 'flex' : 'none';
+    if (m==='read'){ subtitle.textContent = '选择一个过去的胶囊，让那时的你重新开口说话'; loadCapsules(); }
+    else subtitle.textContent = '与认知考古学家深度对话 · 把此刻真实的你封存成胶囊';
+    refreshLabel();
+  }
+
+  // ---------- 胶囊列表 ----------
+  async function loadCapsules(){
+    try {
+      const res = await fetch(API_BASE + '/api/capsules', { headers: authHeaders() });
+      const list = await res.json();
+      if (!list || list.length===0){ capItems.innerHTML = '<div class="empty2">还没有封存的胶囊。<br>先去「封存此刻」完成一次深度对话吧。</div>'; return; }
+      capItems.innerHTML = '';
+      list.forEach(c => {
+        const el = document.createElement('div');
+        el.className = 'cap';
+        el.innerHTML = `<div class="ta">${esc(c.time_anchor || '未标注时间')}</div><div class="id">${esc(c.capsule_id)}</div>${c.summary?`<div class="sum">${esc(c.summary)}</div>`:''}`;
+        el.onclick = () => selectCapsule(c, el);
+        capItems.appendChild(el);
+      });
+    } catch(e){ capItems.innerHTML = '<div class="empty2">加载失败：' + esc(e.message) + '</div>'; }
+  }
+
+  function selectCapsule(c, el){
+    document.querySelectorAll('.cap').forEach(x=>x.classList.remove('active'));
+    el.classList.add('active');
+    currentCapsule = c.capsule_id;
+    readSession = 'read_' + Date.now() + '_' + Math.random().toString(16).slice(2,8);
+    readChat.innerHTML = '';
+    const open = document.createElement('div');
+    open.className = 'msg assistant';
+    open.textContent = `你从时光里取出了这份胶囊：${c.time_anchor || '那段时光'}的他。\n现在的你有什么想问的吗？——注意，他只活在那个时候。`;
+    readChat.appendChild(open);
+    refreshLabel();
+  }
+
+  // ---------- 发送 ----------
+  function addMsg(el, role, text) {
+    const e = document.createElement('div');
+    e.className = 'msg ' + role;
+    e.textContent = text;
+    el.appendChild(e);
+    el.scrollTop = el.scrollHeight;
+    return e;
+  }
+  function activeChatEl(){ return mode==='seal' ? chatEl : readChat; }
+
+  async function send() {
+    if (mode === 'read' && !currentCapsule){ alert('请先从左侧选择一个胶囊'); return; }
+    const message = inputEl.value.trim();
+    if (!message) return;
+    const host = activeChatEl();
+    addMsg(host, 'user', message);
+    inputEl.value = ''; autoGrow();
+    const bubble = addMsg(host, 'assistant', '…（正在思考）');
+    try {
+      const body = mode==='seal'
+        ? { mode:'seal', session_id: sealSession, message }
+        : { mode:'read', session_id: currentSession(), message, capsule_id: currentCapsule };
+      const res = await fetch(API_BASE + '/api/chat', { method:'POST', headers: authHeaders({'Content-Type':'application/json'}), body: JSON.stringify(body) });
+      const data = await res.json();
+      bubble.textContent = data.reply || '(空回复)';
+      // 封存模式：若自动入库成功，插入系统提示
+      if (mode==='seal' && data.saved_capsule_id){
+        setTimeout(()=>{
+          addMsg(chatEl, 'sys', '✅ 本次对话已封存为胶囊（' + data.saved_capsule_id + '），已自动入库，可到「读取过去」查看。');
+        }, 100);
+      }
+    } catch (e) {
+      bubble.textContent = '(连接失败: ' + e.message + ')';
+    }
+  }
+  sendBtn.addEventListener('click', send);
+  inputEl.addEventListener('keydown', (e)=>{ if(e.key==='Enter' && !e.shiftKey){ e.preventDefault(); send(); } });
+  inputEl.addEventListener('input', autoGrow);
+
+  // ---------- 实时语音识别 ----------
+  const SpeechRecognition = window.SpeechRecognition || window.webkitSpeechRecognition;
+  let recognizer = null, recording = false, finalText = '';
+  function startRecording(){
+    if (!SpeechRecognition){ alert('当前浏览器不支持实时语音识别，请用 Chrome/Edge。'); return; }
+    recognizer = new SpeechRecognition();
+    recognizer.lang = 'zh-CN'; recognizer.continuous = true; recognizer.interimResults = true; recognizer.maxAlternatives = 1;
+    finalText = inputEl.value;
+    recognizer.onresult = (e) => {
+      let interim = '';
+      for (let i = e.resultIndex; i < e.results.length; i++){
+        const t = e.results[i][0].transcript;
+        if (e.results[i].isFinal) finalText += t; else interim += t;
+      }
+      inputEl.value = finalText + interim; autoGrow();
+    };
+    recognizer.onerror = (e)=>{ stopRecording(); console.warn('语音识别错误:', e.error); };
+    recognizer.onend = ()=>{ if (recording){ try{recognizer.start();}catch(_){} } };
+    recognizer.start(); recording = true; micBtn.classList.add('recording');
+  }
+  function stopRecording(){
+    if(!recording) return; recording=false; micBtn.classList.remove('recording'); try{recognizer && recognizer.stop();}catch(_){}
+  }
+  micBtn.addEventListener('click', ()=>{ recording ? stopRecording() : startRecording(); });
+
+  function autoGrow(){ inputEl.style.height='auto'; inputEl.style.height=Math.min(inputEl.scrollHeight,120)+'px'; }
+  function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
+
+  refreshLabel();
+</script>
+</body>
+</html>
