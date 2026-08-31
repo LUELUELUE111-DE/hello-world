@@ -119,7 +119,7 @@
   //           Token 只保存在服务端环境变量(COZE_AUTH_TOKEN)中，由 BFF 替前端透传，
   //           因此即使前端源码公开也不会泄露任何服务端凭据。
   // API_BASE：留空 = 前端与 BFF 同域部署(走相对路径)；远程分离时填 BFF 部署域名(如 https://bff.example.coze.site)
-  const API_BASE = '';
+  const API_BASE = 'https://yvdn83dr55.coze.site';
   function authHeaders(extra) {
     const h = Object.assign({}, extra || {});
     // 身份锚点：uid 由浏览器本地生成并稳定持久化，后端据此把胶囊归属到该用户下
