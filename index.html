@@ -47,6 +47,12 @@
   #send { padding:10px 20px; border:none; border-radius:12px; background:var(--accent); color:#fff; font-size:15px; cursor:pointer; flex:none; }
   .hint { font-size:11px; color:var(--muted); margin-top:8px; text-align:center; }
   .session { font-size:11px; color:var(--muted); text-align:center; margin-top:4px; }
+  /* —— 封存后弹出的画像卡片 (D17/D21) —— */
+  #cardOverlay{position:fixed;inset:0;background:rgba(20,24,20,.55);display:none;align-items:center;justify-content:center;z-index:9999;padding:18px;}
+  #cardOverlay.show{display:flex;}
+  #cardModal{position:relative;width:min(430px,94vw);max-height:88vh;overflow:auto;border-radius:18px;box-shadow:0 24px 80px rgba(0,0,0,.35);}
+  #cardFrame{width:100%;height:min(86vh,840px);border:0;border-radius:18px;display:block;background:transparent;}
+  #cardClose{position:absolute;top:10px;right:12px;z-index:2;width:32px;height:32px;border-radius:50%;border:0;background:rgba(255,255,255,.92);color:#2b332e;font-size:19px;line-height:30px;cursor:pointer;box-shadow:0 2px 8px rgba(0,0,0,.25);}
 </style>
 </head>
 <body>
@@ -110,7 +116,11 @@
   if (!capsuleUid) { capsuleUid = 'u_' + Date.now().toString(36) + '_' + Math.random().toString(16).slice(2,10); localStorage.setItem('capsule_uid', capsuleUid); }
   let sealSession = localStorage.getItem('capsule_seal_session');
   if (!sealSession) { sealSession = 'seal_' + Date.now() + '_' + Math.random().toString(16).slice(2,8); localStorage.setItem('capsule_seal_session', sealSession); }
-  // 当前读取会话（切换胶囊时重建）
+  // 当前读取会话：按胶囊持久化映射（断点续聊 v4）——同一胶囊跨刷新复用同一 session，
+  // 服务端 checkpointer 按 thread_id(=session_id) 接上记忆，配合 /api/history 回显历史
+  let readSessionMap = {};
+  try { readSessionMap = JSON.parse(localStorage.getItem('capsule_read_sessions') || '{}') || {}; } catch(e) { readSessionMap = {}; }
+  function saveReadSessionMap(){ try{ localStorage.setItem('capsule_read_sessions', JSON.stringify(readSessionMap)); }catch(e){} }
   let readSession = 'read_' + Date.now() + '_' + Math.random().toString(16).slice(2,8);
   let currentCapsule = null;
 
@@ -119,7 +129,7 @@
   //           Token 只保存在服务端环境变量(COZE_AUTH_TOKEN)中，由 BFF 替前端透传，
   //           因此即使前端源码公开也不会泄露任何服务端凭据。
   // API_BASE：留空 = 前端与 BFF 同域部署(走相对路径)；远程分离时填 BFF 部署域名(如 https://bff.example.coze.site)
-  const API_BASE = 'https://yvdn83dr55.coze.site';
+  const API_BASE = '';
   function authHeaders(extra) {
     const h = Object.assign({}, extra || {});
     // 身份锚点：uid 由浏览器本地生成并稳定持久化，后端据此把胶囊归属到该用户下
@@ -141,8 +151,30 @@
     sealView.style.display = m==='seal' ? 'flex' : 'none';
     readView.style.display  = m==='read' ? 'flex' : 'none';
     if (m==='read'){ subtitle.textContent = '选择一个过去的胶囊，让那时的你重新开口说话'; loadCapsules(); }
-    else subtitle.textContent = '与认知考古学家深度对话 · 把此刻真实的你封存成胶囊';
+    else { subtitle.textContent = '与认知考古学家深度对话 · 把此刻真实的你封存成胶囊'; restoreHistory(sealSession, chatEl, SEAL_OPENING); }
     refreshLabel();
+  }
+
+  // ---------- 断点续聊：历史回显（v4） ----------
+  const SEAL_OPENING = '你好，我是你的认知考古学家。今天想封存此刻的哪一个画面、哪一段心事？你可以用文字，也可以按住下面麦克风用语音告诉我。（录音会自动识别成文字）';
+  async function restoreHistory(sessionId, chatEl2, openingTip){
+    // 拉取该 session 的历史记录并回显；无历史（或接口异常）时保留当前初始画面不动
+    if (!sessionId) return;
+    try {
+      const res = await fetch(API_BASE + '/api/history?session_id=' + encodeURIComponent(sessionId), { headers: authHeaders() });
+      if (!res.ok) return;
+      const list = await res.json();
+      if (!Array.isArray(list) || list.length === 0) return;
+      chatEl2.innerHTML = '';
+      if (openingTip){
+        const tip = document.createElement('div');
+        tip.className = 'msg assistant';
+        tip.textContent = openingTip;
+        chatEl2.appendChild(tip);
+      }
+      list.forEach(m => addMsg(chatEl2, m.role === 'user' ? 'user' : 'assistant', m.content || ''));
+      chatEl2.scrollTop = chatEl2.scrollHeight;
+    } catch(e) { /* 网络异常时静默保留当前画面 */ }
   }
 
   // ---------- 胶囊列表 ----------
@@ -166,13 +198,18 @@
     document.querySelectorAll('.cap').forEach(x=>x.classList.remove('active'));
     el.classList.add('active');
     currentCapsule = c.capsule_id;
-    readSession = 'read_' + Date.now() + '_' + Math.random().toString(16).slice(2,8);
+    // 断点续聊（v4）：同一胶囊复用既有 session（跨刷新接上 checkpointer 记忆），首次才新建
+    readSession = readSessionMap[currentCapsule] || ('read_' + Date.now() + '_' + Math.random().toString(16).slice(2,8));
+    readSessionMap[currentCapsule] = readSession;
+    saveReadSessionMap();
     readChat.innerHTML = '';
+    const opening = `你从时光里取出了这份胶囊：${c.time_anchor || '那段时光'}的他。\n现在的你有什么想问的吗？——注意，他只活在那个时候。`;
     const open = document.createElement('div');
     open.className = 'msg assistant';
-    open.textContent = `你从时光里取出了这份胶囊：${c.time_anchor || '那段时光'}的他。\n现在的你有什么想问的吗？——注意，他只活在那个时候。`;
+    open.textContent = opening;
     readChat.appendChild(open);
     refreshLabel();
+    restoreHistory(currentSession(), readChat, opening);
   }
 
   // ---------- 发送 ----------
@@ -185,6 +222,22 @@
     return e;
   }
   function activeChatEl(){ return mode==='seal' ? chatEl : readChat; }
+
+  /* —— 弹出画像卡片：封存成功后由后端返回 card_url (D17/D21) —— */
+  function showCapsuleCard(cardUrl){
+    const ov=document.getElementById('cardOverlay');
+    const fr=document.getElementById('cardFrame');
+    if(!ov||!fr) return;
+    const base=(typeof API_BASE==='string'?API_BASE:'').replace(/\/+$/,'');
+    fr.src=base+cardUrl;
+    ov.classList.add('show');
+  }
+  (function(){
+    const ov=document.getElementById('cardOverlay');
+    const btn=document.getElementById('cardClose');
+    if(btn) btn.addEventListener('click',()=>ov.classList.remove('show'));
+    if(ov) ov.addEventListener('click',(e)=>{ if(e.target===ov) ov.classList.remove('show'); });
+  })();
 
   async function send() {
     if (mode === 'read' && !currentCapsule){ alert('请先从左侧选择一个胶囊'); return; }
@@ -201,11 +254,16 @@
       const res = await fetch(API_BASE + '/api/chat', { method:'POST', headers: authHeaders({'Content-Type':'application/json'}), body: JSON.stringify(body) });
       const data = await res.json();
       bubble.textContent = data.reply || '(空回复)';
-      // 封存模式：若自动入库成功，插入系统提示
+      // 封存模式：若自动入库成功，插入系统提示 + 弹出「给未来的你 · 此刻画像」卡片 (D17/D21)
       if (mode==='seal' && data.saved_capsule_id){
         setTimeout(()=>{
           addMsg(chatEl, 'sys', '✅ 本次对话已封存为胶囊（' + data.saved_capsule_id + '），已自动入库，可到「读取过去」查看。');
         }, 100);
+        if (data.card_url) showCapsuleCard(data.card_url);
+        // 断点续聊（v4）：本轮封存已完成，轮换新 sealSession——
+        // 旧胶囊的 30 轮上下文不再带入下一轮封存；历史仍可通过「读取过去」回看
+        sealSession = 'seal_' + Date.now() + '_' + Math.random().toString(16).slice(2,8);
+        localStorage.setItem('capsule_seal_session', sealSession);
       }
     } catch (e) {
       bubble.textContent = '(连接失败: ' + e.message + ')';
@@ -244,6 +302,15 @@
   function esc(s){ return (s||'').replace(/[&<>"]/g, c => ({'&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;'}[c])); }
 
   refreshLabel();
+  // 断点续聊（v4）：页面加载即回显封存会话历史（刷新后不再"从零开始"）
+  restoreHistory(sealSession, chatEl, SEAL_OPENING);
 </script>
+  <!-- 封存卡片弹窗 (D17/D21) -->
+  <div id="cardOverlay">
+    <div id="cardModal">
+      <button id="cardClose" title="关闭">×</button>
+      <iframe id="cardFrame" title="给未来的你 · 此刻画像"></iframe>
+    </div>
+  </div>
 </body>
 </html>
