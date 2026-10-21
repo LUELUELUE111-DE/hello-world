@@ -1,0 +1,2130 @@
+<!DOCTYPE html>
+<!-- saved from url=(0074)file:///C:/Users/huawei/Downloads/deepseek_html_20261014_c319ea%20(3).html -->
+<html lang="zh-CN"><head><meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+
+<meta name="viewport" content="width=device-width, initial-scale=1.0">
+<title>Brook的私人图书馆</title>
+<style>
+  :root{
+    --bg:#efe9e1; --card:#ffffff; --ink:#2b2b2b; --muted:#6f6a63;
+    --line:#e6e0d8; --accent:#8b5a2b;
+    --shadow:0 2px 4px rgba(43,43,43,.04), 0 12px 32px rgba(43,43,43,.06);
+  }
+  *{box-sizing:border-box;margin:0;padding:0}
+  html{scroll-behavior:smooth}
+  body{
+    font-family:system-ui,-apple-system,"PingFang SC","Hiragino Sans GB","Microsoft YaHei",sans-serif;
+    background:var(--bg); color:var(--ink); line-height:1.7;
+    -webkit-font-smoothing:antialiased;
+    background-image:
+      radial-gradient(circle at 20% 10%, rgba(139,90,43,.04), transparent 40%),
+      radial-gradient(circle at 80% 90%, rgba(61,90,128,.03), transparent 40%);
+    background-attachment:fixed;
+  }
+  .header{
+    background:linear-gradient(160deg, #1a1a1a 0%, #2a2a2a 60%, #1f1f1f 100%);
+    color:#fff; padding:72px 24px 56px;
+    text-align:center; position:relative; overflow:hidden;
+  }
+  .header::before{
+    content:""; position:absolute; inset:0;
+    background-image:
+      radial-gradient(circle at 15% 20%, rgba(232,200,106,.08), transparent 40%),
+      radial-gradient(circle at 85% 80%, rgba(224,122,95,.06), transparent 40%),
+      repeating-linear-gradient(90deg, transparent 0, transparent 39px, rgba(255,255,255,.015) 39px, rgba(255,255,255,.015) 40px);
+    pointer-events:none;
+  }
+  .header-inner{position:relative; z-index:1; max-width:720px; margin:0 auto}
+  .header-eyebrow{
+    display:inline-block; font-size:.7rem; letter-spacing:.32em; text-transform:uppercase;
+    color:rgba(232,200,106,.7); margin-bottom:20px; padding:5px 18px;
+    border:1px solid rgba(232,200,106,.25); border-radius:999px;
+  }
+  .header h1{
+    font-family:Georgia,"Songti SC","STSong",serif;
+    font-size:clamp(2rem,4.5vw,3rem);
+    font-weight:400; letter-spacing:-.01em; line-height:1.25; margin-bottom:14px;
+  }
+  .header h1 em{font-style:italic; color:#e8c86a; font-weight:400}
+  .header p{color:rgba(255,255,255,.45); font-size:.9rem; letter-spacing:.04em; font-family:Georgia,"Songti SC",serif; font-style:italic}
+  .header-divider{width:60px; height:1px; background:linear-gradient(90deg, transparent, rgba(232,200,106,.5), transparent); margin:28px auto 24px; position:relative}
+  .header-divider::before, .header-divider::after{content:""; position:absolute; top:50%; transform:translateY(-50%); width:4px; height:4px; border-radius:50%; background:rgba(232,200,106,.6)}
+  .header-divider::before{left:-12px} .header-divider::after{right:-12px}
+  .header-stats{display:flex; gap:32px; justify-content:center; flex-wrap:wrap}
+  .stat{text-align:center}
+  .stat-num{font-family:Georgia,serif; font-size:1.6rem; color:#e8c86a; line-height:1; margin-bottom:6px}
+  .stat-label{font-size:.68rem; letter-spacing:.18em; text-transform:uppercase; color:rgba(255,255,255,.35)}
+
+  .toolbar{
+    position:sticky; top:0; z-index:50;
+    background:rgba(239,233,225,.88); backdrop-filter:blur(16px); -webkit-backdrop-filter:blur(16px);
+    border-bottom:1px solid rgba(230,224,216,.8); padding:14px 24px;
+  }
+  .toolbar-inner{max-width:1240px; margin:0 auto; display:flex; gap:14px; align-items:center; flex-wrap:wrap}
+  .search{flex:1; min-width:200px; position:relative}
+  .search input{width:100%; padding:10px 16px 10px 40px; border:1px solid var(--line); border-radius:999px; background:#fff; font-size:.88rem; font-family:inherit; outline:none; transition:.2s; color:var(--ink)}
+  .search input::placeholder{color:#b0a89e}
+  .search input:focus{border-color:var(--accent); box-shadow:0 0 0 4px rgba(139,90,43,.08)}
+  .search::before{content:""; position:absolute; left:15px; top:50%; transform:translateY(-50%); width:14px; height:14px; border:1.5px solid #b0a89e; border-radius:50%; pointer-events:none}
+  .search::after{content:""; position:absolute; left:26px; top:calc(50% + 5px); width:6px; height:1.5px; background:#b0a89e; transform:rotate(45deg); transform-origin:left; pointer-events:none}
+  .actions{display:flex; gap:8px; flex-wrap:wrap}
+  .action-btn{padding:8px 16px; border-radius:999px; border:none; background:var(--accent); color:#fff; font-size:.82rem; font-family:inherit; font-weight:600; cursor:pointer; transition:.2s; white-space:nowrap; display:inline-flex; align-items:center; gap:6px}
+  .action-btn:hover{background:#7a4a1f; transform:translateY(-1px)}
+  .action-btn.ghost{background:transparent; color:var(--muted); border:1px solid var(--line)}
+  .action-btn.ghost:hover{background:#fff; color:var(--ink); transform:none; border-color:#d0c8bc}
+  .action-btn.tree{background:linear-gradient(135deg, #2d4a2d, #1a3a1a); color:#e8c86a; border:1px solid rgba(232,200,106,.3)}
+  .action-btn.tree:hover{background:linear-gradient(135deg, #3a5a3a, #244a24); box-shadow:0 4px 16px rgba(45,74,45,.4); transform:translateY(-1px)}
+
+  .nav-rows{max-width:1240px; margin:14px auto 0; display:flex; flex-direction:column; gap:8px; padding:0 24px}
+  .nav-row{display:flex; gap:6px; align-items:center; flex-wrap:wrap}
+  .nav-row.sub{animation:slideDown .28s cubic-bezier(.22,1,.36,1)}
+  .nav-row.deep{padding-left:20px; animation:slideDown .28s cubic-bezier(.22,1,.36,1)}
+  @keyframes slideDown{from{opacity:0; transform:translateY(-6px)} to{opacity:1; transform:translateY(0)}}
+  .cat-btn{padding:8px 18px; border-radius:999px; border:1px solid transparent; background:transparent; font-size:.82rem; font-family:inherit; color:var(--muted); cursor:pointer; transition:.22s; white-space:nowrap; display:inline-flex; align-items:center; gap:6px}
+  .cat-btn:hover{background:#fff; color:var(--ink); border-color:var(--line)}
+  .cat-btn.active{background:var(--ink); color:#fff; border-color:var(--ink); box-shadow:0 4px 12px rgba(43,43,43,.15)}
+  .cat-btn .cnt{font-size:.7rem; opacity:.6; padding:1px 7px; border-radius:999px; background:rgba(0,0,0,.06); min-width:20px; text-align:center}
+  .cat-btn.active .cnt{background:rgba(255,255,255,.15); opacity:.9}
+  .cat-btn.sub-btn{padding:6px 14px; font-size:.78rem}
+  .cat-btn.deep-btn{padding:5px 12px; font-size:.74rem; border:1px solid var(--line); background:#fff}
+  .cat-btn.deep-btn:hover{background:#faf8f5}
+  .cat-btn .arrow{font-size:.6rem; opacity:.5; margin-left:2px; transition:transform .22s}
+  .cat-btn.active .arrow{transform:rotate(90deg); opacity:.8}
+
+  .main{max-width:1240px; margin:0 auto; padding:48px 24px 100px}
+  .section-header{display:flex; align-items:center; gap:18px; margin:52px 0 26px}
+  .section-header:first-child{margin-top:0}
+  .section-num{font-family:Georgia,serif; font-size:2.2rem; font-style:italic; color:var(--accent); opacity:.35; line-height:1; flex-shrink:0; min-width:44px}
+  .section-title{font-family:Georgia,"Songti SC",serif; font-size:1.15rem; letter-spacing:.02em; color:var(--ink); font-weight:600; flex-shrink:0}
+  .section-line{flex:1; height:1px; background:linear-gradient(90deg, var(--line), transparent)}
+  .section-count{font-size:.72rem; letter-spacing:.12em; color:var(--muted); flex-shrink:0}
+  .sub-header{grid-column:1/-1; display:flex; align-items:center; gap:12px; margin:26px 0 14px}
+  .sub-header:first-child{margin-top:0}
+  .sub-header-label{font-family:Georgia,serif; font-style:italic; color:var(--accent); opacity:.7; font-size:.88rem; flex-shrink:0}
+  .sub-header-line{flex:0 0 40px; height:1px; background:var(--line)}
+  .sub-header-count{font-size:.7rem; color:var(--muted); letter-spacing:.1em; flex-shrink:0}
+  .deep-header{grid-column:1/-1; display:flex; align-items:center; gap:10px; margin:18px 0 12px; padding-left:14px}
+  .deep-header-label{font-size:.76rem; color:var(--muted); letter-spacing:.08em; flex-shrink:0; display:inline-flex; align-items:center; gap:6px}
+  .deep-header-label::before{content:""; width:12px; height:1px; background:var(--line); display:inline-block}
+  .deep-header-count{font-size:.68rem; color:#b0a89e; letter-spacing:.08em}
+  .grid{display:grid; grid-template-columns:repeat(auto-fill, minmax(240px, 1fr)); gap:24px}
+
+  .book-card{position:relative; cursor:pointer; aspect-ratio:4/5; border-radius:16px; padding:26px 22px; display:flex; flex-direction:column; justify-content:center; align-items:center; color:#fff; text-align:center; overflow:hidden; background:linear-gradient(160deg, var(--bg-start, #1a2a3f) 0%, var(--bg-mid, #2a4a6f) 55%, var(--bg-end, #3a5f8a) 100%); transition:transform .4s cubic-bezier(.22,1,.36,1), box-shadow .4s cubic-bezier(.22,1,.36,1); isolation:isolate; box-shadow: inset 0 0 0 1px rgba(255,255,255,.10), inset 0 0 60px rgba(0,0,0,.12), 0 1px 2px rgba(0,0,0,.06), 0 8px 24px rgba(0,0,0,.08); container-type:inline-size;}
+  .book-card::before{content:""; position:absolute; top:-25%; right:-25%; width:60%; height:60%; border-radius:50%; background:var(--glow, rgba(255,255,255,.08)); filter:blur(40px); pointer-events:none; transition:transform .6s cubic-bezier(.22,1,.36,1);}
+  .book-card::after{content:""; position:absolute; bottom:-20%; left:-20%; width:55%; height:55%; border-radius:50%; background:rgba(255,255,255,.04); filter:blur(36px); pointer-events:none; transition:transform .6s cubic-bezier(.22,1,.36,1);}
+  .book-spine{position:absolute; left:0; top:0; bottom:0; width:6px; background:linear-gradient(to right, rgba(0,0,0,.35) 0%, rgba(0,0,0,.15) 40%, transparent 100%); border-radius:16px 0 0 16px; pointer-events:none; z-index:2;}
+  .book-card:hover{transform:translateY(-8px); box-shadow: inset 0 0 0 1px rgba(255,255,255,.16), inset 0 0 60px rgba(0,0,0,.08), 0 2px 4px rgba(0,0,0,.08), 0 20px 40px rgba(0,0,0,.16), 0 40px 80px rgba(0,0,0,.08);}
+  .book-card:hover::before{transform:translate(-8px, 8px) scale(1.1)}
+  .book-card:hover::after{transform:translate(6px, -6px) scale(1.05)}
+  .card-tag{font-size:3.6cqw; letter-spacing:.2em; text-transform:uppercase; color:rgba(255,255,255,.5); margin-bottom:5cqw; position:relative; z-index:1; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; max-width:100%; font-weight:500;}
+  .card-title{font-size:7.2cqw; font-weight:800; line-height:1.28; letter-spacing:-.02em; margin-bottom:2cqw; position:relative; z-index:1; display:-webkit-box; -webkit-line-clamp:3; -webkit-box-orient:vertical; overflow:hidden; max-width:100%;}
+  .card-title em{font-style:normal; color:var(--accent, #e8d4a0); text-shadow:0 0 24px rgba(255,255,255,.15)}
+  .card-sub{font-size:3.4cqw; color:rgba(255,255,255,.55); margin-bottom:6cqw; position:relative; z-index:1; display:-webkit-box; -webkit-line-clamp:2; -webkit-box-orient:vertical; overflow:hidden; max-width:100%; line-height:1.5;}
+  .card-quote-mark{font-family:Georgia,serif; font-size:8cqw; line-height:1; color:var(--accent, #e8d4a0); opacity:.7; margin-bottom:1.5cqw; position:relative; z-index:1; transition:opacity .4s, transform .4s;}
+  .book-card:hover .card-quote-mark{opacity:1; transform:scale(1.05)}
+  .card-quote{font-size:3.8cqw; font-weight:500; line-height:1.7; color:rgba(255,255,255,.9); position:relative; z-index:1; display:-webkit-box; -webkit-line-clamp:4; -webkit-box-orient:vertical; overflow:hidden; max-width:100%; letter-spacing:.01em;}
+  .card-author{margin-top:4cqw; font-size:3.2cqw; color:rgba(255,255,255,.4); letter-spacing:.1em; position:relative; z-index:1; display:-webkit-box; -webkit-line-clamp:1; -webkit-box-orient:vertical; overflow:hidden; max-width:100%;}
+  .card-cta{position:absolute; bottom:16px; right:18px; font-size:3cqw; letter-spacing:.14em; text-transform:uppercase; color:rgba(255,255,255,.6); opacity:0; transform:translateX(-6px); transition:.35s cubic-bezier(.22,1,.36,1); pointer-events:none; z-index:3; font-weight:600;}
+  .book-card:hover .card-cta{opacity:1; transform:translateX(0)}
+  .card-del{position:absolute; top:10px; right:10px; z-index:5; width:26px; height:26px; border-radius:50%; border:none; background:rgba(0,0,0,.35); color:#fff; font-size:.85rem; cursor:pointer; display:none; align-items:center; justify-content:center; transition:.2s; backdrop-filter:blur(4px); line-height:1;}
+  .book-card:hover .card-del{display:flex}
+  .card-del:hover{background:rgba(185,28,28,.9); transform:scale(1.1)}
+
+  .tree-view{
+    position:fixed; inset:0; z-index:100;
+    background:radial-gradient(ellipse at 50% 50%, #1e2a3a 0%, #0d1520 60%, #050810 100%);
+    display:none; overflow:hidden;
+  }
+  .tree-view.active{display:block}
+  .tree-view svg{width:100%; height:100%; display:block; cursor:grab; user-select:none}
+  .tree-view svg.dragging{cursor:grabbing}
+
+  .tree-floating-bar{position:absolute; top:20px; right:20px; display:flex; gap:8px; z-index:10}
+  .tree-floating-btn{
+    padding:10px 18px; background:rgba(255,255,255,.08); border:1px solid rgba(255,255,255,.15);
+    color:#fff; font-size:.82rem; font-family:inherit; border-radius:999px; cursor:pointer;
+    backdrop-filter:blur(10px); transition:.2s; display:inline-flex; align-items:center; gap:6px;
+  }
+  .tree-floating-btn:hover{background:rgba(255,255,255,.18); border-color:rgba(255,255,255,.3)}
+
+  .tree-title{
+    position:absolute; top:24px; left:24px; z-index:10;
+    color:rgba(232,200,106,.85); font-family:Georgia,"Songti SC",serif;
+    font-size:1rem; letter-spacing:.08em; display:flex; align-items:center; gap:10px;
+  }
+  .tree-title::before{content:""; width:20px; height:1px; background:rgba(232,200,106,.4); display:inline-block}
+
+  .map-controls{
+    position:absolute; bottom:24px; right:24px; z-index:10;
+    display:flex; flex-direction:column; gap:8px;
+  }
+  .map-control-btn{
+    width:44px; height:44px; border-radius:12px;
+    background:rgba(255,255,255,.08);
+    border:1px solid rgba(255,255,255,.15);
+    color:#fff; font-size:1.15rem; font-family:Georgia,serif;
+    cursor:pointer; transition:.2s;
+    display:grid; place-items:center; line-height:1;
+    backdrop-filter:blur(10px);
+  }
+  .map-control-btn:hover{
+    background:rgba(255,255,255,.2);
+    border-color:rgba(255,255,255,.35);
+    transform:translateY(-1px);
+  }
+  .map-hint{
+    position:absolute; bottom:24px; left:24px; z-index:10;
+    color:rgba(255,255,255,.35);
+    font-size:.75rem;
+    letter-spacing:.06em;
+    display:flex; gap:16px;
+    align-items:center;
+    pointer-events:none;
+  }
+  .map-hint span{display:inline-flex; align-items:center; gap:6px;}
+  .map-hint kbd{
+    display:inline-block;
+    padding:1px 6px;
+    background:rgba(255,255,255,.1);
+    border:1px solid rgba(255,255,255,.15);
+    border-radius:4px;
+    font-family:monospace;
+    font-size:.7rem;
+    color:rgba(255,255,255,.7);
+  }
+
+  .tree-tooltip{
+    position:fixed; background:rgba(15,20,30,.96); border:1px solid rgba(255,255,255,.15);
+    border-radius:12px; padding:12px 16px; color:#fff; font-size:.82rem;
+    pointer-events:none; z-index:150; opacity:0; transform:translate(-50%, -130%);
+    transition:opacity .18s ease; max-width:280px; backdrop-filter:blur(10px);
+    box-shadow:0 12px 40px rgba(0,0,0,.6);
+  }
+  .tree-tooltip.show{opacity:1}
+  .tree-tooltip .tt-title{font-weight:700; margin-bottom:4px; font-size:.92rem; letter-spacing:-.01em}
+  .tree-tooltip .tt-author{font-size:.72rem; opacity:.55; margin-bottom:8px; letter-spacing:.05em}
+  .tree-tooltip .tt-quote{font-size:.75rem; opacity:.85; font-style:italic; line-height:1.55; padding-left:10px; border-left:2px solid rgba(232,200,106,.5); color:rgba(232,200,106,.9)}
+  .tree-tooltip .tt-hint{font-size:.65rem; opacity:.4; margin-top:8px; letter-spacing:.08em; text-transform:uppercase}
+
+  .map-fruit{cursor:pointer; transition:r .25s cubic-bezier(.34,1.56,.64,1)}
+  .map-fruit:hover{filter:brightness(1.15)}
+
+  .modal{position:fixed; inset:0; z-index:200; background:rgba(20,20,20,.88); backdrop-filter:blur(10px); display:none; flex-direction:column; animation:fadeIn .25s ease;}
+  @keyframes fadeIn{from{opacity:0}to{opacity:1}}
+  .modal.open{display:flex}
+  .modal-head{display:flex; align-items:center; gap:16px; padding:14px 24px; background:linear-gradient(180deg, #1a1a1a 0%, #252525 100%); color:#fff; flex:0 0 auto; border-bottom:1px solid rgba(255,255,255,.06);}
+  .modal-title{font-family:Georgia,"Songti SC",serif; font-size:1rem; font-weight:600; flex:1; letter-spacing:.01em}
+  .modal-cat{font-size:.65rem; letter-spacing:.14em; text-transform:uppercase; opacity:.5; padding:4px 12px; border:1px solid rgba(255,255,255,.15); border-radius:999px;}
+  .modal-tabs{display:flex; gap:4px; background:rgba(255,255,255,.05); padding:3px; border-radius:999px;}
+  .modal-tab{padding:6px 18px; border-radius:999px; border:none; background:transparent; color:rgba(255,255,255,.6); font-size:.8rem; font-family:inherit; cursor:pointer; transition:.22s; font-weight:500;}
+  .modal-tab:hover{color:rgba(255,255,255,.9)}
+  .modal-tab.active{background:#fff; color:#1a1a1a; font-weight:600}
+  .modal-close{width:34px; height:34px; border-radius:50%; border:none; background:rgba(255,255,255,.08); color:#fff; font-size:1.1rem; cursor:pointer; transition:.22s; display:grid; place-items:center; line-height:1;}
+  .modal-close:hover{background:rgba(255,255,255,.18); transform:rotate(90deg)}
+  .modal-body{flex:1; position:relative; background:#fff; overflow:hidden}
+  .modal-body iframe{width:100%; height:100%; border:none; display:block}
+  .modal-empty{position:absolute; inset:0; display:flex; flex-direction:column; align-items:center; justify-content:center; gap:18px; background:#faf8f5; color:var(--muted); text-align:center; padding:24px;}
+  .modal-empty .icon{width:64px; height:64px; border-radius:50%; background:linear-gradient(160deg, #f4f0ea, #e8e0d6); display:grid; place-items:center; font-size:1.8rem; opacity:.7;}
+  .modal-empty h3{font-size:1rem; color:var(--ink); margin-bottom:4px; font-weight:600}
+  .modal-empty p{font-size:.85rem; max-width:420px; line-height:1.75}
+  .modal-empty .path{font-family:ui-monospace,Menlo,Consolas,monospace; background:#fff; border:1px solid var(--line); padding:8px 14px; border-radius:8px; font-size:.78rem; color:var(--accent); word-break:break-all;}
+
+  .upload-modal{position:fixed; inset:0; z-index:300; background:rgba(20,20,20,.6); backdrop-filter:blur(8px); display:none; align-items:center; justify-content:center; padding:24px; animation:fadeIn .25s ease;}
+  .upload-modal.open{display:flex}
+  .upload-box{background:#fff; border-radius:20px; padding:36px 32px; width:100%; max-width:540px; max-height:90vh; overflow-y:auto; box-shadow:0 24px 80px rgba(0,0,0,.35);}
+  .upload-box h2{font-family:Georgia,"Songti SC",serif; font-size:1.3rem; margin-bottom:8px; letter-spacing:-.01em}
+  .upload-box .sub{font-size:.84rem; color:var(--muted); margin-bottom:26px; line-height:1.65}
+  .field{margin-bottom:18px}
+  .field label{display:block; font-size:.78rem; font-weight:600; margin-bottom:8px; color:var(--muted); letter-spacing:.02em}
+  .field input[type=text], .field textarea, .field select{width:100%; padding:10px 14px; border:1px solid var(--line); border-radius:10px; font-size:.88rem; font-family:inherit; outline:none; transition:.2s; background:#faf8f5; color:var(--ink); resize:vertical;}
+  .field textarea{min-height:64px; line-height:1.55}
+  .field input[type=text]:focus, .field textarea:focus, .field select:focus{border-color:var(--accent); background:#fff; box-shadow:0 0 0 4px rgba(139,90,43,.08);}
+  .field input[type=file]{width:100%; padding:9px; border:1px dashed var(--line); border-radius:10px; font-size:.78rem; font-family:inherit; background:#faf8f5; cursor:pointer; color:var(--muted); transition:.2s;}
+  .field input[type=file]:hover{border-color:var(--accent); background:#fff}
+  .field-row-3{display:grid; grid-template-columns:1fr 1fr 1fr; gap:12px}
+  .theme-preview{margin-top:10px; padding:20px 16px; border-radius:12px; background:linear-gradient(160deg, var(--bg-start,#1a2a3f) 0%, var(--bg-mid,#2a4a6f) 55%, var(--bg-end,#3a5f8a) 100%); color:#fff; font-size:.82rem; text-align:center; line-height:1.6; min-height:76px; display:flex; align-items:center; justify-content:center; box-shadow:inset 0 0 0 1px rgba(255,255,255,.1); font-weight:500;}
+  .theme-preview em{font-style:normal; color:var(--accent,#e8d4a0); font-weight:700}
+  .upload-actions{display:flex; gap:12px; margin-top:26px}
+  .upload-actions button{flex:1; padding:12px; border-radius:12px; border:none; font-size:.9rem; font-family:inherit; font-weight:600; cursor:pointer; transition:.2s;}
+  .upload-actions .primary{background:var(--ink); color:#fff; box-shadow:0 4px 12px rgba(43,43,43,.15)}
+  .upload-actions .primary:hover{background:#1a1a1a; transform:translateY(-1px); box-shadow:0 6px 18px rgba(43,43,43,.2)}
+  .upload-actions .secondary{background:#f4f0ea; color:var(--muted)}
+  .upload-actions .secondary:hover{background:#e8e0d6; color:var(--ink)}
+
+  .toast{position:fixed; left:50%; bottom:40px; transform:translate(-50%,20px); z-index:500; background:var(--ink); color:#fff; padding:14px 24px; border-radius:12px; font-size:.85rem; box-shadow:0 16px 48px rgba(43,43,43,.32); opacity:0; pointer-events:none; transition:.3s;}
+  .toast.show{opacity:1; transform:translate(-50%,0)}
+
+  @media (max-width:900px){
+    .section-num{font-size:1.6rem; min-width:32px}
+    .section-title{font-size:1rem}
+  }
+  @media (max-width:640px){
+    .header{padding:52px 20px 40px}
+    .header-stats{gap:24px}
+    .stat-num{font-size:1.3rem}
+    .toolbar{padding:12px 16px}
+    .toolbar-inner{gap:10px}
+    .search{min-width:100%; order:1}
+    .actions{order:3; width:100%; justify-content:flex-end}
+    .nav-rows{padding:0 16px}
+    .nav-row{flex-wrap:nowrap; overflow-x:auto; scrollbar-width:none}
+    .nav-row::-webkit-scrollbar{display:none}
+    .nav-row.deep{padding-left:12px}
+    .main{padding:32px 16px 80px}
+    .grid{grid-template-columns:repeat(2,1fr); gap:16px}
+    .book-card{padding:18px 14px; border-radius:14px}
+    .section-header{gap:12px; margin:36px 0 18px}
+    .modal-head{padding:10px 14px; gap:10px}
+    .modal-title{font-size:.88rem}
+    .modal-cat{display:none}
+    .modal-tab{padding:5px 12px; font-size:.75rem}
+    .field-row-3{grid-template-columns:1fr}
+    .upload-box{padding:28px 22px}
+    .card-cta{display:none}
+    .map-hint{display:none}
+  }
+</style>
+</head>
+<body style="overflow: hidden;">
+
+<header class="header">
+  <div class="header-inner">
+    <div class="header-eyebrow">Private Library</div>
+    <h1>Brook的<em>私人图书馆</em></h1>
+    <p>每一本书，都是一段走过的路</p>
+    <div class="header-divider"></div>
+    <div class="header-stats">
+      <div class="stat"><div class="stat-num" id="statTotal">19</div><div class="stat-label">藏书</div></div>
+      <div class="stat"><div class="stat-num" id="statNote">19</div><div class="stat-label">读书笔记</div></div>
+      <div class="stat"><div class="stat-num" id="statAxes">19</div><div class="stat-label">三板斧</div></div>
+    </div>
+  </div>
+</header>
+
+<div class="toolbar">
+  <div class="toolbar-inner">
+    <div class="search"><input type="text" id="searchInput" placeholder="搜索书名或作者…"></div>
+    <div class="actions">
+      <button class="action-btn tree" id="treeBtn">🧠 思维导图</button>
+      <button class="action-btn" id="addBtn">＋ 添加书籍</button>
+      <button class="action-btn ghost" id="exportBtn">导出备份</button>
+      <button class="action-btn ghost" id="importBtn">导入备份</button>
+      <input type="file" id="importFile" accept=".json" style="display:none">
+    </div>
+  </div>
+  <div class="nav-rows">
+    <div class="nav-row" id="navMain"><button class="cat-btn active" data-cat="全部" style="background:#2b2b2b; color:#fff; border-color:#2b2b2b; box-shadow:0 4px 12px rgba(43,43,43,0.25);">
+      全部<span class="cnt" style="background:rgba(255,255,255,.2); opacity:1">19</span>
+      
+    </button><button class="cat-btn " data-cat="社科" style="">
+      社科<span class="cnt">7</span>
+      <span class="arrow">›</span>
+    </button><button class="cat-btn " data-cat="商业" style="">
+      商业<span class="cnt">5</span>
+      <span class="arrow">›</span>
+    </button><button class="cat-btn " data-cat="文学" style="">
+      文学<span class="cnt">2</span>
+      <span class="arrow">›</span>
+    </button><button class="cat-btn " data-cat="成长" style="">
+      成长<span class="cnt">5</span>
+      <span class="arrow">›</span>
+    </button><button class="cat-btn " data-cat="其他" style="">
+      其他<span class="cnt">0</span>
+      
+    </button></div>
+    <div class="nav-row sub" id="navSub" style="display:none"></div>
+    <div class="nav-row deep" id="navDeep" style="display:none"></div>
+  </div>
+</div>
+
+<main class="main" id="main">
+        <div class="section-header">
+          <div class="section-num">01</div>
+          <div class="section-title">社科</div>
+          <div class="section-line"></div>
+          <div class="section-count">7 本</div>
+        </div><div class="sub-header">
+      <div class="sub-header-label">心理学</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">3 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-1" style="
+    --bg-start: #1a3a2a;
+    --bg-mid: #2d5a42;
+    --bg-end: #3d7a58;
+    --accent: #a8e0c0;
+    --glow: rgba(255,255,255,.08);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本心理咨询入门书</div>
+      <div class="card-title">蛤蟆先生<br><em>去看心理医生</em></div>
+      <div class="card-sub">在人生的长河里，能摆渡你的只能是你自己</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">能将你摆渡过岸的，只能是你自己。</div>
+      
+      <div class="card-author">—— 罗伯特·戴博德</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-2" style="
+    --bg-start: #1a2a3f;
+    --bg-mid: #2a4a6f;
+    --bg-end: #3a5f8a;
+    --accent: #fbbf24;
+    --glow: rgba(194,65,12,.14);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一位心理治疗师的回忆录</div>
+      <div class="card-title">也许你该<br><em>找个人聊聊</em></div>
+      <div class="card-sub">把痛苦说出来，就是自我疗愈的开始</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">我们很难跟谁完全的告别，哪怕是死亡亦如是。</div>
+      
+      <div class="card-author">—— 洛莉·戈特利布</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-3" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1a3a5f;
+    --bg-end: #2a5f7a;
+    --accent: #f0d48a;
+    --glow: rgba(201,152,44,.15);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">阿德勒心理学的哲学课</div>
+      <div class="card-title">被讨厌的<br><em>勇气</em></div>
+      <div class="card-sub">所谓自由，就是被别人讨厌</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">不畏惧被人讨厌而是勇往直前，这才是对人而言的自由。</div>
+      
+      <div class="card-author">—— 岸见一郎 · 古贺史健</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">沟通</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">3 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-0" style="
+    --bg-start: #7a1f1f;
+    --bg-mid: #a83232;
+    --bg-end: #c0523d;
+    --accent: #f5d78e;
+    --glow: rgba(255,255,255,.08);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本关于沟通的寓言</div>
+      <div class="card-title">我就是<em>你</em>啊</div>
+      <div class="card-sub">走进他人内心的7项修炼</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">解释向来都是没用的，它们唯一的好处就是引发别人的反驳。</div>
+      
+      <div class="card-author">—— 皮埃尔·佩利西耶</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-5" style="
+    --bg-start: #1a2e2a;
+    --bg-mid: #2a5f52;
+    --bg-end: #3a7a6a;
+    --accent: #e8d4a0;
+    --glow: rgba(255,255,255,.06);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本关于温柔对话的沟通宝典</div>
+      <div class="card-title">当我们必须谈论<br><em>死亡与别离时</em></div>
+      <div class="card-sub">温柔地完成那些艰难的对话</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">怎么听比怎么说更重要。</div>
+      
+      <div class="card-author">—— 凯瑟琳·曼尼克斯</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-6" style="
+    --bg-start: #1a2e35;
+    --bg-mid: #2a5f6a;
+    --bg-end: #3a7a82;
+    --accent: #f0d48a;
+    --glow: rgba(255,255,255,.06);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本母女共同书写的人生指南</div>
+      <div class="card-title">我离开<br><em>之后</em></div>
+      <div class="card-sub">那些来不及说的爱与牵挂</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">失去的本质就是教我们慢慢学会接受。</div>
+      
+      <div class="card-author">—— 苏西·霍普金斯</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">人际关系</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">1 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-4" style="
+    --bg-start: #7a1f1f;
+    --bg-mid: #a83232;
+    --bg-end: #c0523d;
+    --accent: #f5d78e;
+    --glow: rgba(255,255,255,.08);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本关于爱语的工具词典</div>
+      <div class="card-title">爱的<em>五种语言</em></div>
+      <div class="card-sub">让爱被听懂</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">让一个人感到被爱的东西，不一定会让另一个人也感到被爱。</div>
+      
+      <div class="card-author">—— 盖瑞·查普曼</div>
+      <div class="card-cta">打开 →</div>
+    </div></div>
+        <div class="section-header">
+          <div class="section-num">02</div>
+          <div class="section-title">商业</div>
+          <div class="section-line"></div>
+          <div class="section-count">5 本</div>
+        </div><div class="sub-header">
+      <div class="sub-header-label">理财</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">2 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-9" style="
+    --bg-start: #1a0a2e;
+    --bg-mid: #3b1a6a;
+    --bg-end: #5b21b6;
+    --accent: #f0d48a;
+    --glow: rgba(212,160,23,.18);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">全球畅销 4100 万册的理财启蒙书</div>
+      <div class="card-title">富爸爸<br><em>穷爸爸</em></div>
+      <div class="card-sub">让金钱为你工作</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">穷人和中产阶级为钱而工作，富人让钱为他工作。</div>
+      
+      <div class="card-author">—— 罗伯特·清崎</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-10" style="
+    --bg-start: #1a0a2e;
+    --bg-mid: #3b1a6a;
+    --bg-end: #5b21b6;
+    --accent: #e8d4a0;
+    --glow: rgba(212,160,23,.18);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">行为金融学经典</div>
+      <div class="card-title">金钱<br><em>心理学</em></div>
+      <div class="card-sub">财富、人性和幸福的永恒真相</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">理财的成功与否和你的智商关系不大，但和你的行为习惯紧密相关。</div>
+      
+      <div class="card-author">—— 摩根·豪泽尔</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">管理</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">1 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-8" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1a3a5f;
+    --bg-end: #2a5f7a;
+    --accent: #e8d4a0;
+    --glow: rgba(201,152,44,.15);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">混沌学园创新必修教科书</div>
+      <div class="card-title">第一性<br><em>原理</em></div>
+      <div class="card-sub">任何理性系统的根基性命题</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">任何系统都有自己的基石假设，不能被缺省，也不能被违反。</div>
+      
+      <div class="card-author">—— 李善友</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">谈判</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">1 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-7" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1e3a5f;
+    --bg-end: #2a4a6f;
+    --accent: #fbbf24;
+    --glow: rgba(217,119,6,.14);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本谈判实战手册</div>
+      <div class="card-title">哈佛<br><em>经典谈判术</em></div>
+      <div class="card-sub">你一开口就赢麻了</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">谈判不是在谈判桌上开始的，而是在你坐下之前就已经定局了。</div>
+      
+      <div class="card-author">—— 迪帕克·马尔霍特拉</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">经济</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">1 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-11" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1a3a5f;
+    --bg-end: #2a5f7a;
+    --accent: #e8d4a0;
+    --glow: rgba(201,152,44,.15);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本用寓言讲透经济学的入门书</div>
+      <div class="card-title">小岛<br><em>经济学</em></div>
+      <div class="card-sub">鱼、美元和经济的故事</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">努力使有限的资源产生最大的效益，这就是经济最简单的定义。</div>
+      
+      <div class="card-author">—— 彼得·希夫 · 安德鲁·希夫</div>
+      <div class="card-cta">打开 →</div>
+    </div></div>
+        <div class="section-header">
+          <div class="section-num">03</div>
+          <div class="section-title">文学</div>
+          <div class="section-line"></div>
+          <div class="section-count">2 本</div>
+        </div><div class="sub-header">
+      <div class="sub-header-label">小说</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">2 本</div>
+    </div><div class="deep-header">
+          <div class="deep-header-label">寓言</div>
+          <div class="deep-header-count">2</div>
+        </div><div class="grid">
+    <div class="book-card" data-id="builtin-12" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1e3a5f;
+    --bg-end: #2a5f7a;
+    --accent: #f0c96b;
+    --glow: rgba(196,138,44,.15);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本关于人生意义的寓言</div>
+      <div class="card-title">世界尽头的<br><em>咖啡馆</em></div>
+      <div class="card-sub">你为什么来这里？</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">生活本来就很精彩，只不过有人没发现自己是作者。</div>
+      
+      <div class="card-author">—— 约翰·史崔勒基</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-13" style="
+    --bg-start: #1a0a0a;
+    --bg-mid: #3d1010;
+    --bg-end: #5a1a1a;
+    --accent: #e8c86a;
+    --glow: rgba(201,152,44,.12);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一则政治讽喻寓言</div>
+      <div class="card-title">动物<br><em>农场</em></div>
+      <div class="card-sub">所有动物一律平等，但有些动物更平等</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">凡靠两条腿行走者皆为仇敌。</div>
+      
+      <div class="card-author">—— 乔治·奥威尔</div>
+      <div class="card-cta">打开 →</div>
+    </div></div>
+        <div class="section-header">
+          <div class="section-num">04</div>
+          <div class="section-title">成长</div>
+          <div class="section-line"></div>
+          <div class="section-count">5 本</div>
+        </div><div class="sub-header">
+      <div class="sub-header-label">认知</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">4 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-14" style="
+    --bg-start: #0f2a3f;
+    --bg-mid: #1e4a6f;
+    --bg-end: #2a5f8a;
+    --accent: #fbbf24;
+    --glow: rgba(194,65,12,.14);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一部个人成长方法论</div>
+      <div class="card-title">认知<em>觉醒</em></div>
+      <div class="card-sub">开启自我改变的原动力</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">耐心不是毅力带来的结果，而是具有长远目光的结果。</div>
+      
+      <div class="card-author">—— 周岭</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-15" style="
+    --bg-start: #0f1a2e;
+    --bg-mid: #1a3a5f;
+    --bg-end: #2a5f7a;
+    --accent: #e8d4a0;
+    --glow: rgba(201,168,76,.15);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">《认知觉醒》姊妹篇</div>
+      <div class="card-title">认知<em>驱动</em></div>
+      <div class="card-sub">做成一件对他人很有用的事</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">你的一生至少要主动做成一件对他人很有用的事。</div>
+      
+      <div class="card-author">—— 周岭</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-16" style="
+    --bg-start: #3a2a0a;
+    --bg-mid: #7a5a1a;
+    --bg-end: #b8860b;
+    --accent: #fff3c4;
+    --glow: rgba(255,255,255,.10);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">一本关于变化的寓言</div>
+      <div class="card-title">谁动了<br><em>我的奶酪</em></div>
+      <div class="card-sub">一个在工作生活中处理变化的绝妙方法</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">如果不改变，你就会被淘汰。</div>
+      
+      <div class="card-author">—— 斯宾塞·约翰逊</div>
+      <div class="card-cta">打开 →</div>
+    </div>
+    <div class="book-card" data-id="builtin-17" style="
+    --bg-start: #3a2a0a;
+    --bg-mid: #7a5a1a;
+    --bg-end: #b8860b;
+    --accent: #fff3c4;
+    --glow: rgba(44,95,138,.12);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">奶酪故事的续篇</div>
+      <div class="card-title">走出<br><em>迷宫</em></div>
+      <div class="card-sub">一个走出困境的绝妙方法</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">你不是你的观念，你是选择自己观念的那个人。</div>
+      
+      <div class="card-author">—— 斯宾塞·约翰逊</div>
+      <div class="card-cta">打开 →</div>
+    </div></div><div class="sub-header">
+      <div class="sub-header-label">行为设计</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">1 本</div>
+    </div><div class="grid">
+    <div class="book-card" data-id="builtin-18" style="
+    --bg-start: #2b2b2b;
+    --bg-mid: #3d3d3d;
+    --bg-end: #4a4a4a;
+    --accent: #e07a5f;
+    --glow: rgba(224,122,95,.14);
+  ">
+      <div class="book-spine"></div>
+      
+      <div class="card-tag">行为设计学经典</div>
+      <div class="card-title">福格<br><em>行为模型</em></div>
+      <div class="card-sub">让好习惯自然生长</div>
+      
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">行为可以被设计，不靠硬扛。</div>
+      
+      <div class="card-author">—— B.J. 福格</div>
+      <div class="card-cta">打开 →</div>
+    </div></div></main>
+
+<div class="tree-view active" id="treeView">
+  <div class="tree-title">Brook's Library · 思维导图</div>
+  <div class="tree-floating-bar">
+    <button class="tree-floating-btn" id="treeBackBtn">📚 返回网格</button>
+  </div>
+  <svg id="treeSvg" preserveAspectRatio="xMidYMid meet" viewBox="0 0 1700 1500"><defs>
+    <radialgradient id="mapBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#1a2434"></stop>
+      <stop offset="55%" stop-color="#0e1622"></stop>
+      <stop offset="100%" stop-color="#060a12"></stop>
+    </radialgradient>
+    <filter id="mapSoftGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <fegaussianblur stdDeviation="6"></fegaussianblur>
+    </filter>
+  </defs><rect x="0" y="0" width="1700" height="1500" fill="url(#mapBg)"></rect><circle cx="0" cy="0" r="0.4" fill="#ffffff" opacity="0.06"></circle><circle cx="985.3425383029389" cy="57.70206484885421" r="0.9416065290773986" fill="#ffffff" opacity="0.09481712396514921"></circle><circle cx="1135.8016797004893" cy="1371.1809710373473" r="0.9310935474699363" fill="#ffffff" opacity="0.1424640148137405"></circle><circle cx="530.3033283598779" cy="628.6802004433412" r="0.46939132022125707" fill="#ffffff" opacity="0.292451870517616"></circle><circle cx="752.9964050765557" cy="501.748079295794" r="0.8771710207896831" fill="#ffffff" opacity="0.3281409786193399"></circle><circle cx="57.86993684232584" cy="1477.5349636256578" r="0.7167409085799591" fill="#ffffff" opacity="0.2060930417786585"></circle><circle cx="178.4639592980966" cy="72.97330411438452" r="1.1828697380318771" fill="#ffffff" opacity="0.3203504885417351"></circle><circle cx="1672.3936162416067" cy="161.66512634663377" r="1.3078592689038486" fill="#ffffff" opacity="0.23797950656022293"></circle><circle cx="1512.291102121526" cy="340.90047406334634" r="0.5138955833739601" fill="#ffffff" opacity="0.1582316380483098"></circle><circle cx="989.540053496421" cy="406.75443427608116" r="0.5474724531435641" fill="#ffffff" opacity="0.2605003630176361"></circle><circle cx="1396.022268258821" cy="629.0073830459733" r="1.3205685705098857" fill="#ffffff" opacity="0.09476728677596838"></circle><circle cx="1073.4992912207417" cy="861.1035825779254" r="0.9208035846153507" fill="#ffffff" opacity="0.07259547274621582"></circle><circle cx="1257.2237101128849" cy="898.9204858862649" r="0.844387134128192" fill="#ffffff" opacity="0.3228466616907644"></circle><circle cx="1070.626510045986" cy="9.88465478803846" r="0.4938287353365013" fill="#ffffff" opacity="0.1524914328963496"></circle><circle cx="1168.5979623282037" cy="1378.089840978646" r="0.8248882207211864" fill="#ffffff" opacity="0.3180473884114326"></circle><circle cx="1093.7270328722661" cy="1466.312823282351" r="0.8883781263197307" fill="#ffffff" opacity="0.3297988622836419"></circle><circle cx="1276.4580155329895" cy="113.16592072944331" r="0.4621570667863125" fill="#ffffff" opacity="0.2535489517454698"></circle><circle cx="1042.7810462213529" cy="1286.731124666403" r="0.8696712309760187" fill="#ffffff" opacity="0.25266968526571876"></circle><circle cx="1448.0129862069589" cy="119.2435130396916" r="1.1235649254798772" fill="#ffffff" opacity="0.08574845659619314"></circle><circle cx="297.92309327458497" cy="1064.7837297838123" r="1.3615563977276905" fill="#ffffff" opacity="0.2210570916898723"></circle><circle cx="1123.489931250333" cy="424.7857048521837" r="0.5902687491506186" fill="#ffffff" opacity="0.08368097723410756"></circle><circle cx="957.3604891869763" cy="766.0193533920392" r="0.5181428578784107" fill="#ffffff" opacity="0.19484287968312855"></circle><circle cx="823.3610078903439" cy="1207.3778002668405" r="0.733789925549354" fill="#ffffff" opacity="0.26900997671906224"></circle><circle cx="975.9173921534966" cy="1278.932596105733" r="0.6695052960625617" fill="#ffffff" opacity="0.11910144283607224"></circle><circle cx="1173.8855958650674" cy="131.97001912158157" r="0.9595220443756262" fill="#ffffff" opacity="0.3568171802738652"></circle><circle cx="47.313346669398015" cy="435.0443255952996" r="0.4258930769923609" fill="#ffffff" opacity="0.3571950549646863"></circle><circle cx="54.88912599394098" cy="258.4290463146317" r="0.7120648680451268" fill="#ffffff" opacity="0.20313799374358496"></circle><circle cx="1351.9736253350857" cy="723.7178757532092" r="0.4104908483808686" fill="#ffffff" opacity="0.19106109084692433"></circle><circle cx="666.6247965062212" cy="1119.3385619626497" r="0.508240135043161" fill="#ffffff" opacity="0.24343525511663755"></circle><circle cx="839.3018344275333" cy="1390.6753440496686" r="1.252781397756189" fill="#ffffff" opacity="0.09346129932906477"></circle><circle cx="710.6739832757739" cy="492.26609100514906" r="1.041196139024032" fill="#ffffff" opacity="0.2730381745504564"></circle><circle cx="1527.971086475361" cy="1251.5544487432635" r="0.8809956170647638" fill="#ffffff" opacity="0.22783478497163742"></circle><circle cx="1517.892717232462" cy="1436.2040694359166" r="1.267846273817122" fill="#ffffff" opacity="0.12362590315729903"></circle><circle cx="261.0298150424569" cy="693.5713138427673" r="0.4340507018918288" fill="#ffffff" opacity="0.1841065792070003"></circle><circle cx="1257.152310237143" cy="739.4839911030431" r="0.5540566318144556" fill="#ffffff" opacity="0.2558578617435251"></circle><circle cx="1248.4809922658314" cy="504.3112147541251" r="1.2916369854487129" fill="#ffffff" opacity="0.3138722954325749"></circle><circle cx="1423.8323865396524" cy="1198.8305914164812" r="1.2041490951218292" fill="#ffffff" opacity="0.07286408789346752"></circle><circle cx="885.3660938460962" cy="404.2579440938425" r="1.0080893808020845" fill="#ffffff" opacity="0.24546436772157904"></circle><circle cx="764.52330566608" cy="135.62556790566305" r="0.5858871374861337" fill="#ffffff" opacity="0.23936156756113633"></circle><circle cx="137.22215235829935" cy="795.2189089983221" r="1.277404511636996" fill="#ffffff" opacity="0.09633720283469302"></circle><circle cx="1181.0153158694447" cy="794.5807754113048" r="1.001109347521742" fill="#ffffff" opacity="0.32052448770133196"></circle><circle cx="373.5815120555344" cy="276.85152335652674" r="1.0482691359233285" fill="#ffffff" opacity="0.0882191724589211"></circle><circle cx="80.80992236036764" cy="23.41569235068164" r="0.7386632454421488" fill="#ffffff" opacity="0.3270642752360436"></circle><circle cx="341.6332764478284" cy="1346.1964133239235" r="1.152574166697741" fill="#ffffff" opacity="0.2023229326672299"></circle><circle cx="1662.1505425388023" cy="368.9694302047428" r="1.1869887624583497" fill="#ffffff" opacity="0.15999970009666867"></circle><circle cx="889.991872261453" cy="1083.7287054691842" r="0.5317196697345935" fill="#ffffff" opacity="0.2160145349056256"></circle><circle cx="1368.3615004505555" cy="80.3138437695452" r="1.195993734631338" fill="#ffffff" opacity="0.14689786302434185"></circle><circle cx="927.352953519221" cy="908.3832870592232" r="1.0930147304292404" fill="#ffffff" opacity="0.2525529315236418"></circle><circle cx="1342.2502845089184" cy="580.0629474470043" r="1.112096848670626" fill="#ffffff" opacity="0.22221761233355208"></circle><circle cx="400.2098712422594" cy="542.3772427794802" r="0.6712591238814639" fill="#ffffff" opacity="0.12077244572152267"></circle><circle cx="1483.9299323692103" cy="685.1387569367944" r="0.48204968851532615" fill="#ffffff" opacity="0.34913919619226363"></circle><circle cx="71.37435395743523" cy="295.5072141803612" r="1.0182145738603139" fill="#ffffff" opacity="0.068870479765028"></circle><circle cx="1682.7208244125359" cy="108.33196913881693" r="0.9362600389344152" fill="#ffffff" opacity="0.3075028043110797"></circle><circle cx="1541.0840631049723" cy="1314.0520041215495" r="1.0676853221542841" fill="#ffffff" opacity="0.13896841828187462"></circle><circle cx="95.01587175836903" cy="1033.74982736932" r="0.7231911030852644" fill="#ffffff" opacity="0.06778610979978111"></circle><circle cx="683.8134423102019" cy="361.089087401524" r="0.8080982121449779" fill="#ffffff" opacity="0.1125126736742095"></circle><circle cx="1192.7598461938032" cy="413.91973767531454" r="1.1679594467626884" fill="#ffffff" opacity="0.3425407583321066"></circle><circle cx="1335.00393303475" cy="1042.7287381808128" r="0.4878786530552134" fill="#ffffff" opacity="0.2047632600406905"></circle><circle cx="1267.1406457637204" cy="509.84394163970137" r="1.168746398956864" fill="#ffffff" opacity="0.11180075567895983"></circle><circle cx="911.0425993465469" cy="1451.3742378849201" r="0.788992101776239" fill="#ffffff" opacity="0.3218618634121958"></circle><circle cx="1015.9517850146585" cy="1237.270401627029" r="0.6897220988434128" fill="#ffffff" opacity="0.12755456330356535"></circle><circle cx="619.6949609322473" cy="402.2122343612864" r="0.9083451616992534" fill="#ffffff" opacity="0.09469879533877246"></circle><circle cx="485.3422898826011" cy="312.90450109008816" r="0.5410937585969805" fill="#ffffff" opacity="0.26665308647221536"></circle><circle cx="1680.494437179732" cy="1366.2605958033964" r="0.7494095775313326" fill="#ffffff" opacity="0.14901813102202138"></circle><circle cx="1613.7073113177394" cy="343.1074307918607" r="1.1556568524378235" fill="#ffffff" opacity="0.24847775970061775"></circle><circle cx="465.54075179446954" cy="619.127810392456" r="0.5072622220017365" fill="#ffffff" opacity="0.1397829457464104"></circle><circle cx="564.1300198767567" cy="841.2855827227759" r="0.9327173388795927" fill="#ffffff" opacity="0.11282064391467428"></circle><circle cx="613.2818721696822" cy="860.3683816927514" r="0.43250396910561906" fill="#ffffff" opacity="0.08407677112423698"></circle><circle cx="168.38404352747602" cy="511.7981040129962" r="1.309251747500093" fill="#ffffff" opacity="0.11500691154957166"></circle><circle cx="786.0475035802665" cy="939.9043232824624" r="0.740726003072632" fill="#ffffff" opacity="0.3165193341581562"></circle><circle cx="1177.6890538807493" cy="824.3922148794809" r="0.7285775621116045" fill="#ffffff" opacity="0.2823228145778194"></circle><circle cx="973.5848471769714" cy="215.7639982069668" r="0.6665858064137865" fill="#ffffff" opacity="0.12621261531909111"></circle><circle cx="739.9560262048908" cy="1286.1224846201367" r="1.2716591276679536" fill="#ffffff" opacity="0.16122218986507503"></circle><circle cx="1201.2680190790434" cy="510.740745552539" r="1.0150592147241695" fill="#ffffff" opacity="0.19446444642468122"></circle><circle cx="567.4428734339017" cy="1193.9906019470072" r="1.1854562499378516" fill="#ffffff" opacity="0.17739545020027436"></circle><circle cx="1619.2189600311394" cy="416.71964785200544" r="0.9824752295011422" fill="#ffffff" opacity="0.10827609497369849"></circle><circle cx="40.32917095901212" cy="985.3212133984925" r="0.7674935933377128" fill="#ffffff" opacity="0.3589261366805294"></circle><circle cx="798.5085609365342" cy="140.9193130020867" r="1.3725194377780752" fill="#ffffff" opacity="0.0889895627181977"></circle><circle cx="1176.257882014761" cy="180.9128869444976" r="1.0102269901602994" fill="#ffffff" opacity="0.13157238172439972"></circle><circle cx="737.217746112583" cy="1455.2835583781416" r="0.8560762835099013" fill="#ffffff" opacity="0.23423350440694776"></circle><circle cx="755.0376120045257" cy="1.9648577635962283" r="1.387666240258477" fill="#ffffff" opacity="0.3193761026379752"></circle><circle cx="1048.9603053218161" cy="921.667810784129" r="1.0830030702913063" fill="#ffffff" opacity="0.2930185513748802"></circle><circle cx="748.5610015529346" cy="619.8671657275554" r="0.7074127816871624" fill="#ffffff" opacity="0.09473332462599501"></circle><circle cx="280.8762050117366" cy="794.3716181252967" r="1.3524790987088635" fill="#ffffff" opacity="0.2535251942493778"></circle><circle cx="835.0103762005347" cy="900.6118526594946" r="0.5999776271859446" fill="#ffffff" opacity="0.2536856984968472"></circle><circle cx="1652.4650307175762" cy="1175.0504475094203" r="0.7825362844363554" fill="#ffffff" opacity="0.2309231897300924"></circle><circle cx="1074.6960096417752" cy="941.7833810857701" r="0.768382976455905" fill="#ffffff" opacity="0.31816999061717066"></circle><circle cx="1642.908199752128" cy="1012.6098311811802" r="1.2655197693876743" fill="#ffffff" opacity="0.09174278912993031"></circle><circle cx="1087.2172199473425" cy="840.3461593643442" r="0.8197392517162371" fill="#ffffff" opacity="0.15182718134106835"></circle><circle cx="1281.0772634260502" cy="710.0463793212839" r="0.5869095406436827" fill="#ffffff" opacity="0.3409826220069226"></circle><circle cx="832.884256203397" cy="1330.1690011085157" r="1.272248166690042" fill="#ffffff" opacity="0.10104025987398926"></circle><circle cx="804.0753066779871" cy="1152.2902114738827" r="0.4923278371374181" fill="#ffffff" opacity="0.20525092730245886"></circle><circle cx="418.1653573985386" cy="346.0625319576138" r="0.7152446070307633" fill="#ffffff" opacity="0.07689330783192418"></circle><circle cx="618.7970720102385" cy="366.0144379682606" r="0.9061562016162498" fill="#ffffff" opacity="0.08924669756175717"></circle><circle cx="1338.2369962666417" cy="1015.3629958249439" r="0.5812227934951807" fill="#ffffff" opacity="0.25764932712787414"></circle><circle cx="175.58870915418083" cy="288.6017001401342" r="0.41918392825609774" fill="#ffffff" opacity="0.2759600218757987"></circle><circle cx="1041.9158165932458" cy="1455.7517780444869" r="0.9232838671727223" fill="#ffffff" opacity="0.3061849723913474"></circle><circle cx="491.6026188613614" cy="1327.0945912809111" r="0.8846450725299292" fill="#ffffff" opacity="0.14519100383855402"></circle><circle cx="726.0022075322922" cy="178.40251734219237" r="0.5536345500862808" fill="#ffffff" opacity="0.09984883312878082"></circle><circle cx="149.09240411943756" cy="1334.8092881606135" r="1.2828400035854428" fill="#ffffff" opacity="0.34910270274354843"></circle><circle cx="353.85356818442233" cy="1272.9926070712027" r="1.3407867856753" fill="#ffffff" opacity="0.33724604663853824"></circle><circle cx="1291.032701642689" cy="1194.7072917755577" r="1.2866636289931193" fill="#ffffff" opacity="0.19660797366464974"></circle><circle cx="1184.3898844916112" cy="434.4893151217093" r="0.7913181715033716" fill="#ffffff" opacity="0.14065520888685568"></circle><circle cx="373.70401779116946" cy="94.33462034940021" r="0.774983282708854" fill="#ffffff" opacity="0.3571585487641022"></circle><circle cx="39.413434321568275" cy="455.35201997699915" r="0.5429527320506168" fill="#ffffff" opacity="0.23616447307573252"></circle><circle cx="1147.7559583028778" cy="309.12582347446005" r="0.7079051480890485" fill="#ffffff" opacity="0.3117239164619241"></circle><circle cx="1116.3895502268133" cy="864.7870602617331" r="0.9903395665591234" fill="#ffffff" opacity="0.27216819236215084"></circle><circle cx="1068.6225561978063" cy="66.7993759852834" r="1.3510978552370942" fill="#ffffff" opacity="0.2004041173722362"></circle><circle cx="796.2315248645609" cy="1170.4055714881179" r="1.0140434967164764" fill="#ffffff" opacity="0.18561282137758098"></circle><circle cx="1017.5812422363379" cy="315.05205256689806" r="0.46188997815479527" fill="#ffffff" opacity="0.2707254073103832"></circle><circle cx="1296.5679653869302" cy="64.5198500405968" r="1.1691187419732159" fill="#ffffff" opacity="0.15177155240031426"></circle><circle cx="57.88619321610895" cy="511.0889945135568" r="1.3678457147347216" fill="#ffffff" opacity="0.09504757049449836"></circle><circle cx="564.4257563624706" cy="551.5998808432414" r="0.7176667858133442" fill="#ffffff" opacity="0.11797873728006379"></circle><circle cx="1656.8369798525964" cy="970.1619746701908" r="0.5180162428790936" fill="#ffffff" opacity="0.12194314750937338"></circle><circle cx="1648.499475459539" cy="1175.0846103022923" r="1.1853546081087187" fill="#ffffff" opacity="0.11367275241505923"></circle><circle cx="409.23426564140755" cy="1264.4426737751928" r="0.825481905003835" fill="#ffffff" opacity="0.14547332405069027"></circle><circle cx="627.0126529227127" cy="686.182058241684" r="1.1642029163835104" fill="#ffffff" opacity="0.24646465398451253"></circle><circle cx="476.001917089161" cy="1199.6390665444778" r="1.242656471216287" fill="#ffffff" opacity="0.31870244927973546"></circle><circle cx="1562.4259246520523" cy="368.1421343862894" r="0.6389381351022166" fill="#ffffff" opacity="0.312348793647252"></circle><circle cx="1078.18055434509" cy="312.53919341179426" r="0.7731741114825127" fill="#ffffff" opacity="0.269445312157186"></circle><circle cx="1316.9164242368424" cy="666.9152006779768" r="1.1524177077102649" fill="#ffffff" opacity="0.30816224188398333"></circle><circle cx="967.5638168926525" cy="1403.718126595777" r="1.0936208427796372" fill="#ffffff" opacity="0.07536852287463261"></circle><circle cx="367.14611788684124" cy="750.4090747843293" r="1.3368847000077948" fill="#ffffff" opacity="0.19221171415352728"></circle><circle cx="1250.0928414308873" cy="601.5917025033559" r="0.6172125863362453" fill="#ffffff" opacity="0.06885458225238836"></circle><circle cx="400.83027689729533" cy="738.2937299444166" r="0.4511174420562384" fill="#ffffff" opacity="0.3171629444159043"></circle><circle cx="1308.9076331234537" cy="1029.1556798838428" r="0.5045004908082774" fill="#ffffff" opacity="0.13404404617409454"></circle><circle cx="1034.9993702415304" cy="659.1223225022986" r="1.2307671766815473" fill="#ffffff" opacity="0.14054715022049094"></circle><circle cx="1078.5892487809178" cy="579.6491057444655" r="0.5342572086268774" fill="#ffffff" opacity="0.19914835200812375"></circle><circle cx="802.850413422857" cy="566.4820885067456" r="0.8161671863294032" fill="#ffffff" opacity="0.17828236064066005"></circle><circle cx="1264.400461679179" cy="419.26485748626874" r="0.695183835332864" fill="#ffffff" opacity="0.30326390662390623"></circle><circle cx="1472.0437301351922" cy="1319.8718522980926" r="1.1945958693708234" fill="#ffffff" opacity="0.10733902547304751"></circle><circle cx="1036.9229209576588" cy="1450.6883992580697" r="1.2376884253266325" fill="#ffffff" opacity="0.08102973647561157"></circle><circle cx="1010.1782897232624" cy="660.2507545467233" r="0.742730664924602" fill="#ffffff" opacity="0.3392120218669879"></circle><circle cx="707.730647938115" cy="960.643006459577" r="0.9043971945196972" fill="#ffffff" opacity="0.23197698306044912"></circle><circle cx="1373.355259692471" cy="840.666512522148" r="0.7502161673686715" fill="#ffffff" opacity="0.27249226633954093"></circle><circle cx="1438.1254494831865" cy="1121.728238857031" r="1.0674043064194847" fill="#ffffff" opacity="0.19648946761422847"></circle><circle cx="1282.268193820346" cy="967.8022624029836" r="0.7183284654660383" fill="#ffffff" opacity="0.26461809468197317"></circle><circle cx="199.2579066854887" cy="547.9260133961361" r="0.4973651123676973" fill="#ffffff" opacity="0.09959837224711009"></circle><circle cx="953.4570100426208" cy="18.68065873713931" r="0.6050270197178179" fill="#ffffff" opacity="0.30529590304064186"></circle><circle cx="757.9478596064291" cy="320.1502260753841" r="0.9731456026478554" fill="#ffffff" opacity="0.15204548490743036"></circle><circle cx="887.4384060261946" cy="1171.6076255725056" r="0.6309190456799115" fill="#ffffff" opacity="0.11988758729108667"></circle><circle cx="977.184571140242" cy="890.7713508942834" r="1.0758160602003044" fill="#ffffff" opacity="0.2792060906716506"></circle><circle cx="688.6359911753971" cy="439.0804019130883" r="0.8681490093207685" fill="#ffffff" opacity="0.22965813796050497"></circle><circle cx="516.5710837143706" cy="1355.7326196905706" r="1.1410853934925398" fill="#ffffff" opacity="0.16550254071276865"></circle><circle cx="1072.5326198278708" cy="1200.251989885146" r="1.393277686726742" fill="#ffffff" opacity="0.23086240690332488"></circle><circle cx="1030.7516396911524" cy="1189.7593748894906" r="1.2020243826395016" fill="#ffffff" opacity="0.11094229440073831"></circle><circle cx="1665.5978959244749" cy="848.6078042769805" r="1.381471045553917" fill="#ffffff" opacity="0.34634971808642145"></circle><circle cx="1522.8387935356295" cy="999.6179456356913" r="0.9089295601574122" fill="#ffffff" opacity="0.26651574516887194"></circle><circle cx="1337.8808961791947" cy="472.86691054614494" r="0.5962218167427636" fill="#ffffff" opacity="0.10371606725289893"></circle><circle cx="1173.0743566949968" cy="709.9691119211684" r="0.6577955150482012" fill="#ffffff" opacity="0.07262555728453662"></circle><circle cx="770.2946286077349" cy="790.1511893396673" r="0.9933437980565941" fill="#ffffff" opacity="0.1591828304429873"></circle><circle cx="1026.3844759800122" cy="1450.5943812697524" r="0.9772748449944629" fill="#ffffff" opacity="0.08217085695774586"></circle><circle cx="420.1018375919375" cy="388.06079914138536" r="1.2845029802760108" fill="#ffffff" opacity="0.26324622277985327"></circle><circle cx="703.2706155063352" cy="1282.596670790781" r="0.5168251881972538" fill="#ffffff" opacity="0.3297294138459256"></circle><circle cx="1202.9012954568316" cy="988.2979573558259" r="1.3454593199020848" fill="#ffffff" opacity="0.11980855510861146"></circle><circle cx="1414.6211843483343" cy="357.6932773999033" r="1.2381189267529407" fill="#ffffff" opacity="0.16934650906056048"></circle><circle cx="593.3387606572069" cy="1065.403921827965" r="0.5923467636006535" fill="#ffffff" opacity="0.29449042147622095"></circle><circle cx="1691.0712249542485" cy="766.1208780509696" r="1.3697666053652937" fill="#ffffff" opacity="0.06259252975156414"></circle><circle cx="1616.4320532727288" cy="479.79188061799505" r="0.4020924824748363" fill="#ffffff" opacity="0.0818090225076594"></circle><circle cx="533.0384573117044" cy="367.2177380803987" r="0.5003655725289718" fill="#ffffff" opacity="0.18634122952204052"></circle><circle cx="308.1106496989378" cy="1343.5434403436375" r="0.6425759001089318" fill="#ffffff" opacity="0.14210094200062484"></circle><circle cx="159.70857711145072" cy="1499.1560128655692" r="0.947373945822983" fill="#ffffff" opacity="0.3399813040648587"></circle><circle cx="21.383212317959988" cy="986.8382899658172" r="0.8653395130371792" fill="#ffffff" opacity="0.3388416586317908"></circle><circle cx="363.49728668283205" cy="661.9319867149898" r="1.1537138459156266" fill="#ffffff" opacity="0.10346884653641608"></circle><circle cx="286.96156625846925" cy="534.9781856493792" r="1.2019296108536763" fill="#ffffff" opacity="0.3142160369943303"></circle><circle cx="832.6915817902773" cy="777.2650090992101" r="0.5643522480953834" fill="#ffffff" opacity="0.29382027716361336"></circle><circle cx="1025.0310697471605" cy="535.254427792097" r="0.5204146451127599" fill="#ffffff" opacity="0.1031293177374755"></circle><circle cx="671.2759573987569" cy="460.26482790148293" r="0.9792092171614059" fill="#ffffff" opacity="0.26471313805392127"></circle><circle cx="1366.226066687159" cy="433.47678116333554" r="1.0532633935385092" fill="#ffffff" opacity="0.3183651666922378"></circle><circle cx="624.6511753932282" cy="885.6262597946625" r="0.739479345966538" fill="#ffffff" opacity="0.11477596174314385"></circle><circle cx="1227.342269658402" cy="323.48461448782473" r="1.2233294037199811" fill="#ffffff" opacity="0.07900803893222473"></circle><circle cx="11.178052156901686" cy="944.0108699982375" r="1.2453406635035207" fill="#ffffff" opacity="0.14108864286214157"></circle><circle cx="1022.1754630605574" cy="66.13994980216376" r="0.8977053798284033" fill="#ffffff" opacity="0.17778949817326065"></circle><circle cx="278.53915591003897" cy="1218.5691279319144" r="1.3162165493253268" fill="#ffffff" opacity="0.294429791922048"></circle><circle cx="765.7174148705963" cy="852.4273144321342" r="1.1956693365099453" fill="#ffffff" opacity="0.3132323315645044"></circle><circle cx="1402.9738505641035" cy="1084.1403666981932" r="0.7382397658351693" fill="#ffffff" opacity="0.35452184220936034"></circle><circle cx="181.52063310044468" cy="1178.2511594392417" r="0.6389591316023143" fill="#ffffff" opacity="0.3306265105982311"></circle><circle cx="1300.8041395105465" cy="1015.6215285969665" r="1.091038969427609" fill="#ffffff" opacity="0.23333095554640748"></circle><circle cx="440.02570677985204" cy="829.7921344928909" r="0.7133764648446231" fill="#ffffff" opacity="0.1340611862296646"></circle><circle cx="410.64420056973177" cy="835.9348336452967" r="0.9600587846201961" fill="#ffffff" opacity="0.102732946806791"></circle><circle cx="270.1869311291375" cy="435.38998184703814" r="0.9708521994347393" fill="#ffffff" opacity="0.3329495470273832"></circle><circle cx="64.65584445504646" cy="741.8784010114905" r="0.7149240535876743" fill="#ffffff" opacity="0.1482353733126365"></circle><circle cx="300.44659996674454" cy="366.2583768891636" r="0.7279112760355929" fill="#ffffff" opacity="0.13375817245847427"></circle><circle cx="173.16200846471475" cy="1176.7253406942473" r="0.9007822150437278" fill="#ffffff" opacity="0.3351427603888942"></circle><circle cx="952.392282497749" cy="1323.8575663654046" r="0.6362732170158779" fill="#ffffff" opacity="0.11179188046040509"></circle><circle cx="693.766953064187" cy="638.2228846705402" r="1.0034385282509901" fill="#ffffff" opacity="0.3117890992661705"></circle><circle cx="875.916392369345" cy="983.9902427647758" r="0.8504874006233877" fill="#ffffff" opacity="0.10258349660558451"></circle><circle cx="1441.497349630663" cy="961.9924654543865" r="0.8178368842804048" fill="#ffffff" opacity="0.09214059117672149"></circle><circle cx="9.217560888646403" cy="727.3369868353257" r="1.0891644933566567" fill="#ffffff" opacity="0.3345882809285831"></circle><circle cx="1127.9243075936392" cy="964.2554550446221" r="1.3393654727755346" fill="#ffffff" opacity="0.2643447837044368"></circle><circle cx="721.1281411873642" cy="961.0205636563478" r="0.6930325757915853" fill="#ffffff" opacity="0.226511167576391"></circle><circle cx="1265.1924606274406" cy="1078.4489544676035" r="1.3311012945272522" fill="#ffffff" opacity="0.2923849282263836"></circle><circle cx="1662.8235000967834" cy="1154.9340491837938" r="1.241188876889646" fill="#ffffff" opacity="0.2185843138876953"></circle><circle cx="1690.5399476767343" cy="953.7481197039597" r="0.8743188110514893" fill="#ffffff" opacity="0.27389607997152776"></circle><circle cx="1444.7277053717698" cy="1037.6030914185321" r="0.5169666599134871" fill="#ffffff" opacity="0.29907383385503633"></circle><circle cx="795.0681256041207" cy="875.9279886835429" r="1.3675569626124342" fill="#ffffff" opacity="0.09453817444615197"></circle><circle cx="1492.5898103443615" cy="593.3559481791235" r="0.6118366994982353" fill="#ffffff" opacity="0.1903360991896625"></circle><circle cx="1212.2840902517964" cy="999.0900221819174" r="1.245844666891935" fill="#ffffff" opacity="0.29626893273685706"></circle><circle cx="1464.535479569895" cy="1012.8095833736097" r="1.085466344049928" fill="#ffffff" opacity="0.06767780288297218"></circle><circle cx="854.1701452510097" cy="363.3861029811669" r="0.9477265062872903" fill="#ffffff" opacity="0.3406337405636441"></circle><g id="mapContent" transform="translate(227.28962637761515, -52.46879050289351) scale(0.9750233588877438)"><circle cx="850" cy="750" r="100" fill="#e8c86a" opacity="0.09" filter="url(#mapSoftGlow)"></circle><g><rect x="736" y="708" width="228" height="84" rx="42" ry="42" fill="rgba(232,200,106,.3)" opacity="0.35" filter="url(#mapSoftGlow)"></rect><rect x="740" y="712" width="220" height="76" rx="38" ry="38" fill="#1a1a1a" stroke="#e8c86a" stroke-width="1"></rect><text x="850" y="754" text-anchor="middle" fill="#e8c86a" font-size="20" font-weight="400" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">Brook的图书馆</text></g><text x="850" y="802" text-anchor="middle" fill="rgba(232,200,106,.55)" font-size="11" letter-spacing="0.15em" font-family="Georgia, serif" font-style="italic" pointer-events="none">· 19 本藏书 ·</text><path d="M 850 750 C 765.1471862576143 750, 765.1471862576143 580.2943725152286, 680.2943725152286 580.2943725152286" stroke="#a83232" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 850 750 C 934.8528137423857 750, 934.8528137423857 580.2943725152286, 1019.7056274847714 580.2943725152286" stroke="#3b1a6a" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 850 750 C 934.8528137423857 750, 934.8528137423857 919.7056274847714, 1019.7056274847714 919.7056274847714" stroke="#7a5a1a" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 850 750 C 765.1471862576143 750, 765.1471862576143 919.7056274847714, 680.2943725152286 919.7056274847714" stroke="#1a3a5f" stroke-width="3" fill="none" stroke-linecap="round" opacity="0.55"></path><g><rect x="626.2943725152286" y="552.2943725152286" width="108" height="56" rx="28" ry="28" fill="rgba(168,50,50,0.5)" opacity="0.35" filter="url(#mapSoftGlow)"></rect><rect x="630.2943725152286" y="556.2943725152286" width="100" height="48" rx="24" ry="24" fill="#a83232" stroke="#f5d78e" stroke-width="1"></rect><text x="680.2943725152286" y="584.2943725152286" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.1em" pointer-events="none">社科</text></g><text x="680.2943725152286" y="612.2943725152286" text-anchor="middle" fill="#f5d78e" font-size="10" opacity="0.65" letter-spacing="0.15em" font-family="Georgia, serif" font-style="italic" pointer-events="none">7 本</text><g><rect x="965.7056274847714" y="552.2943725152286" width="108" height="56" rx="28" ry="28" fill="rgba(59,26,106,0.5)" opacity="0.35" filter="url(#mapSoftGlow)"></rect><rect x="969.7056274847714" y="556.2943725152286" width="100" height="48" rx="24" ry="24" fill="#3b1a6a" stroke="#f0d48a" stroke-width="1"></rect><text x="1019.7056274847714" y="584.2943725152286" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.1em" pointer-events="none">商业</text></g><text x="1019.7056274847714" y="612.2943725152286" text-anchor="middle" fill="#f0d48a" font-size="10" opacity="0.65" letter-spacing="0.15em" font-family="Georgia, serif" font-style="italic" pointer-events="none">5 本</text><g><rect x="965.7056274847714" y="891.7056274847714" width="108" height="56" rx="28" ry="28" fill="rgba(122,90,26,0.5)" opacity="0.35" filter="url(#mapSoftGlow)"></rect><rect x="969.7056274847714" y="895.7056274847714" width="100" height="48" rx="24" ry="24" fill="#7a5a1a" stroke="#fff3c4" stroke-width="1"></rect><text x="1019.7056274847714" y="923.7056274847714" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.1em" pointer-events="none">文学</text></g><text x="1019.7056274847714" y="951.7056274847714" text-anchor="middle" fill="#fff3c4" font-size="10" opacity="0.65" letter-spacing="0.15em" font-family="Georgia, serif" font-style="italic" pointer-events="none">2 本</text><g><rect x="626.2943725152286" y="891.7056274847714" width="108" height="56" rx="28" ry="28" fill="rgba(26,58,95,0.5)" opacity="0.35" filter="url(#mapSoftGlow)"></rect><rect x="630.2943725152286" y="895.7056274847714" width="100" height="48" rx="24" ry="24" fill="#1a3a5f" stroke="#e8d4a0" stroke-width="1"></rect><text x="680.2943725152286" y="923.7056274847714" text-anchor="middle" fill="#fff" font-size="16" font-weight="700" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.1em" pointer-events="none">成长</text></g><text x="680.2943725152286" y="951.7056274847714" text-anchor="middle" fill="#e8d4a0" font-size="10" opacity="0.65" letter-spacing="0.15em" font-family="Georgia, serif" font-style="italic" pointer-events="none">5 本</text><path d="M 680.2943725152286 580.2943725152286 C 548.0540202866898 580.2943725152286, 548.0540202866898 598.0716315006231, 415.81366805815094 598.0716315006231" stroke="#c0523d" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 680.2943725152286 580.2943725152286 C 642.7798086590868 580.2943725152286, 642.7798086590868 360.50686835498936, 605.2652448029451 360.50686835498936" stroke="#c0523d" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 680.2943725152286 580.2943725152286 C 739.3953567538533 580.2943725152286, 739.3953567538533 292.8923834491085, 798.4963409924782 292.8923834491085" stroke="#c0523d" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1019.7056274847714 580.2943725152286 C 970.8327407016388 580.2943725152286, 970.8327407016388 295.6633633262366, 921.9598539185063 295.6633633262366" stroke="#5b21b6" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1019.7056274847714 580.2943725152286 C 1039.2706286824814 580.2943725152286, 1039.2706286824814 340.1369988733508, 1058.8356298801916 340.1369988733508" stroke="#5b21b6" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1019.7056274847714 580.2943725152286 C 1120.9267224486237 580.2943725152286, 1120.9267224486237 479.6187839454624, 1222.147817412476 479.6187839454624" stroke="#5b21b6" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1019.7056274847714 580.2943725152286 C 1162.0211320792673 580.2943725152286, 1162.0211320792673 678.0401460814938, 1304.3366366737635 678.0401460814938" stroke="#5b21b6" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1019.7056274847714 919.7056274847714 C 1097.4873734152916 919.7056274847714, 1097.4873734152916 1075.2691193458118, 1175.2691193458118 1075.2691193458118" stroke="#b8860b" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 680.2943725152286 919.7056274847714 C 629.9565782303455 919.7056274847714, 629.9565782303455 1122.147817412476, 579.6187839454624 1122.147817412476" stroke="#2a5f7a" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 680.2943725152286 919.7056274847714 C 537.9788679207327 919.7056274847714, 537.9788679207327 821.9598539185063, 395.66336332623666 821.9598539185063" stroke="#2a5f7a" stroke-width="2.2" fill="none" stroke-linecap="round" opacity="0.55"></path><g><rect x="383.81366805815094" y="582.0716315006231" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f5d78e" stroke-width="1"></rect><text x="415.81366805815094" y="602.0716315006231" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">沟通</text></g><text x="415.81366805815094" y="620.0716315006231" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">3</text><g><rect x="570.7652448029451" y="344.50686835498936" width="69" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f5d78e" stroke-width="1"></rect><text x="605.2652448029451" y="364.50686835498936" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">心理学</text></g><text x="605.2652448029451" y="382.50686835498936" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">3</text><g><rect x="756.4963409924782" y="276.8923834491085" width="84" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f5d78e" stroke-width="1"></rect><text x="798.4963409924782" y="296.8923834491085" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">人际关系</text></g><text x="798.4963409924782" y="314.8923834491085" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">1</text><g><rect x="889.9598539185063" y="279.6633633262366" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f0d48a" stroke-width="1"></rect><text x="921.9598539185063" y="299.6633633262366" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">谈判</text></g><text x="921.9598539185063" y="317.6633633262366" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">1</text><g><rect x="1026.8356298801916" y="324.1369988733508" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f0d48a" stroke-width="1"></rect><text x="1058.8356298801916" y="344.1369988733508" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">管理</text></g><text x="1058.8356298801916" y="362.1369988733508" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">1</text><g><rect x="1190.147817412476" y="463.6187839454624" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f0d48a" stroke-width="1"></rect><text x="1222.147817412476" y="483.6187839454624" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">理财</text></g><text x="1222.147817412476" y="501.6187839454624" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">2</text><g><rect x="1272.3366366737635" y="662.0401460814938" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#f0d48a" stroke-width="1"></rect><text x="1304.3366366737635" y="682.0401460814938" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">经济</text></g><text x="1304.3366366737635" y="700.0401460814938" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">1</text><g><rect x="1143.2691193458118" y="1059.2691193458118" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#fff3c4" stroke-width="1"></rect><text x="1175.2691193458118" y="1079.2691193458118" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">小说</text></g><text x="1175.2691193458118" y="1097.2691193458118" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">2</text><g><rect x="547.6187839454624" y="1106.147817412476" width="64" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#e8d4a0" stroke-width="1"></rect><text x="579.6187839454624" y="1126.147817412476" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">认知</text></g><text x="579.6187839454624" y="1144.147817412476" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">4</text><g><rect x="353.66336332623666" y="805.9598539185063" width="84" height="32" rx="16" ry="16" fill="rgba(20,30,45,.85)" stroke="#e8d4a0" stroke-width="1"></rect><text x="395.66336332623666" y="825.9598539185063" text-anchor="middle" fill="rgba(240,232,212,.9)" font-size="13" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.04em" pointer-events="none">行为设计</text></g><text x="395.66336332623666" y="843.9598539185063" text-anchor="middle" fill="rgba(255,255,255,.45)" font-size="9" letter-spacing="0.1em" font-family="Georgia, serif" pointer-events="none">1</text><path d="M 415.81366805815094 598.0716315006231 C 314.91892686323786 598.0716315006231, 314.91892686323786 678.3427352938829, 214.02418566832478 678.3427352938829" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 415.81366805815094 598.0716315006231 C 330.86416833039783 598.0716315006231, 330.86416833039783 538.621400348693, 245.91466860264472 538.621400348693" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 415.81366805815094 598.0716315006231 C 361.9550902760246 598.0716315006231, 361.9550902760246 409.4994710301845, 308.0965124938982 409.4994710301845" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 605.2652448029451 360.50686835498936 C 501.3584524217772 360.50686835498936, 501.3584524217772 297.4516600406098, 397.4516600406094 297.4516600406098" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 605.2652448029451 360.50686835498936 C 557.3823579165647 360.50686835498936, 557.3823579165647 208.09651249389822, 509.4994710301844 208.09651249389822" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 605.2652448029451 360.50686835498936 C 621.943322575819 360.50686835498936, 621.943322575819 145.91466860264484, 638.621400348693 145.91466860264484" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 798.4963409924782 292.8923834491085 C 788.4195381431805 292.8923834491085, 788.4195381431805 114.02418566832478, 778.3427352938827 114.02418566832478" stroke="#c0523d" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 921.9598539185063 295.6633633262366 C 936.0389557721271 295.6633633262366, 936.0389557721271 117.87946201911177, 950.1180576257478 117.87946201911177" stroke="#5b21b6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1058.8356298801916 340.1369988733508 C 1099.6947748567509 340.1369988733508, 1099.6947748567509 179.75582451944456, 1140.55391983331 179.75582451944456" stroke="#5b21b6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1222.147817412476 479.6187839454624 C 1262.3480786859332 479.6187839454624, 1262.3480786859332 297.4516600406096, 1302.5483399593904 297.4516600406096" stroke="#5b21b6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1222.147817412476 479.6187839454624 C 1321.1959964465157 479.6187839454624, 1321.1959964465157 459.4460801666901, 1420.2441754805554 459.4460801666901" stroke="#5b21b6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1304.3366366737635 678.0401460814938 C 1393.2285873273258 678.0401460814938, 1393.2285873273258 649.8819423742523, 1482.1205379808882 649.8819423742523" stroke="#5b21b6" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1175.2691193458118 1075.2691193458118 C 1308.2760100765177 1075.2691193458118, 1308.2760100765177 994.9173967136575, 1441.2829008072235 994.9173967136575" stroke="#b8860b" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 1175.2691193458118 1075.2691193458118 C 1135.0932580297347 1075.2691193458118, 1135.0932580297347 1341.2829008072235, 1094.9173967136576 1341.2829008072235" stroke="#b8860b" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 579.6187839454624 1122.147817412476 C 664.7503631598572 1122.147817412476, 664.7503631598572 1382.120537980888, 749.8819423742522 1382.120537980888" stroke="#2a5f7a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 579.6187839454624 1122.147817412476 C 569.5324320560762 1122.147817412476, 569.5324320560762 1320.2441754805554, 559.4460801666901 1320.2441754805554" stroke="#2a5f7a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 579.6187839454624 1122.147817412476 C 488.535221993036 1122.147817412476, 488.535221993036 1202.5483399593904, 397.4516600406096 1202.5483399593904" stroke="#2a5f7a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 579.6187839454624 1122.147817412476 C 429.68730423245347 1122.147817412476, 429.68730423245347 1040.55391983331, 279.75582451944456 1040.55391983331" stroke="#2a5f7a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><path d="M 395.66336332623666 821.9598539185063 C 306.7714126726743 821.9598539185063, 306.7714126726743 850.1180576257478, 217.87946201911188 850.1180576257478" stroke="#2a5f7a" stroke-width="1.4" fill="none" stroke-linecap="round" opacity="0.55"></path><circle cx="214.02418566832478" cy="678.3427352938829" r="18" fill="#f5d78e" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="214.02418566832478" cy="678.3427352938829" r="11" fill="#f5d78e" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-0"></circle><circle cx="211.02418566832478" cy="675.3427352938829" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="195.02418566832478" y="683.3427352938829" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">我就是你啊</text><circle cx="245.91466860264472" cy="538.621400348693" r="18" fill="#e8d4a0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="245.91466860264472" cy="538.621400348693" r="11" fill="#e8d4a0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-5"></circle><circle cx="242.91466860264472" cy="535.621400348693" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="226.91466860264472" y="543.621400348693" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">当我们必须谈论死亡与别…</text><circle cx="308.0965124938982" cy="409.4994710301845" r="18" fill="#f0d48a" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="308.0965124938982" cy="409.4994710301845" r="11" fill="#f0d48a" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-6"></circle><circle cx="305.0965124938982" cy="406.4994710301845" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="289.0965124938982" y="414.4994710301845" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">我离开之后</text><circle cx="397.4516600406094" cy="297.4516600406098" r="18" fill="#a8e0c0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="397.4516600406094" cy="297.4516600406098" r="11" fill="#a8e0c0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-1"></circle><circle cx="394.4516600406094" cy="294.4516600406098" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="378.4516600406094" y="302.4516600406098" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">蛤蟆先生去看心理医生</text><circle cx="509.4994710301844" cy="208.09651249389822" r="18" fill="#fbbf24" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="509.4994710301844" cy="208.09651249389822" r="11" fill="#fbbf24" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-2"></circle><circle cx="506.4994710301844" cy="205.09651249389822" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="490.4994710301844" y="213.09651249389822" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">也许你该找个人聊聊</text><circle cx="638.621400348693" cy="145.91466860264484" r="18" fill="#f0d48a" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="638.621400348693" cy="145.91466860264484" r="11" fill="#f0d48a" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-3"></circle><circle cx="635.621400348693" cy="142.91466860264484" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="619.621400348693" y="150.91466860264484" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">被讨厌的勇气</text><circle cx="778.3427352938827" cy="114.02418566832478" r="18" fill="#f5d78e" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="778.3427352938827" cy="114.02418566832478" r="11" fill="#f5d78e" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-4"></circle><circle cx="775.3427352938827" cy="111.02418566832478" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="759.3427352938827" y="119.02418566832478" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">爱的五种语言</text><circle cx="950.1180576257478" cy="117.87946201911177" r="18" fill="#fbbf24" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="950.1180576257478" cy="117.87946201911177" r="11" fill="#fbbf24" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-7"></circle><circle cx="947.1180576257478" cy="114.87946201911177" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="969.1180576257478" y="122.87946201911177" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">哈佛经典谈判术</text><circle cx="1140.55391983331" cy="179.75582451944456" r="18" fill="#e8d4a0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1140.55391983331" cy="179.75582451944456" r="11" fill="#e8d4a0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-8"></circle><circle cx="1137.55391983331" cy="176.75582451944456" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1159.55391983331" y="184.75582451944456" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">第一性原理</text><circle cx="1302.5483399593904" cy="297.4516600406096" r="18" fill="#f0d48a" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1302.5483399593904" cy="297.4516600406096" r="11" fill="#f0d48a" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-9"></circle><circle cx="1299.5483399593904" cy="294.4516600406096" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1321.5483399593904" y="302.4516600406096" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">富爸爸穷爸爸</text><circle cx="1420.2441754805554" cy="459.4460801666901" r="18" fill="#e8d4a0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1420.2441754805554" cy="459.4460801666901" r="11" fill="#e8d4a0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-10"></circle><circle cx="1417.2441754805554" cy="456.4460801666901" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1439.2441754805554" y="464.4460801666901" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">金钱心理学</text><circle cx="1482.1205379808882" cy="649.8819423742523" r="18" fill="#e8d4a0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1482.1205379808882" cy="649.8819423742523" r="11" fill="#e8d4a0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-11"></circle><circle cx="1479.1205379808882" cy="646.8819423742523" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1501.1205379808882" y="654.8819423742523" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">小岛经济学</text><circle cx="1441.2829008072235" cy="994.9173967136575" r="18" fill="#f0c96b" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1441.2829008072235" cy="994.9173967136575" r="11" fill="#f0c96b" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-12"></circle><circle cx="1438.2829008072235" cy="991.9173967136575" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1460.2829008072235" y="999.9173967136575" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">世界尽头的咖啡馆</text><circle cx="1094.9173967136576" cy="1341.2829008072235" r="18" fill="#e8c86a" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="1094.9173967136576" cy="1341.2829008072235" r="11" fill="#e8c86a" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-13"></circle><circle cx="1091.9173967136576" cy="1338.2829008072235" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="1113.9173967136576" y="1346.2829008072235" text-anchor="start" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">动物农场</text><circle cx="749.8819423742522" cy="1382.120537980888" r="18" fill="#fbbf24" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="749.8819423742522" cy="1382.120537980888" r="11" fill="#fbbf24" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-14"></circle><circle cx="746.8819423742522" cy="1379.120537980888" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="730.8819423742522" y="1387.120537980888" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">认知觉醒</text><circle cx="559.4460801666901" cy="1320.2441754805554" r="18" fill="#e8d4a0" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="559.4460801666901" cy="1320.2441754805554" r="11" fill="#e8d4a0" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-15"></circle><circle cx="556.4460801666901" cy="1317.2441754805554" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="540.4460801666901" y="1325.2441754805554" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">认知驱动</text><circle cx="397.4516600406096" cy="1202.5483399593904" r="18" fill="#fff3c4" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="397.4516600406096" cy="1202.5483399593904" r="11" fill="#fff3c4" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-16"></circle><circle cx="394.4516600406096" cy="1199.5483399593904" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="378.4516600406096" y="1207.5483399593904" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">谁动了我的奶酪</text><circle cx="279.75582451944456" cy="1040.55391983331" r="18" fill="#fff3c4" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="279.75582451944456" cy="1040.55391983331" r="11" fill="#fff3c4" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-17"></circle><circle cx="276.75582451944456" cy="1037.55391983331" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="260.75582451944456" y="1045.55391983331" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">谁动了我的奶酪2：走出…</text><circle cx="217.87946201911188" cy="850.1180576257478" r="18" fill="#e07a5f" opacity="0.2" filter="url(#mapSoftGlow)" pointer-events="none"></circle><circle cx="217.87946201911188" cy="850.1180576257478" r="11" fill="#e07a5f" stroke="rgba(255,255,255,.55)" stroke-width="1.3" class="map-fruit" data-book-id="builtin-18"></circle><circle cx="214.87946201911188" cy="847.1180576257478" r="3" fill="rgba(255,255,255,.75)" pointer-events="none"></circle><text x="198.87946201911188" y="855.1180576257478" text-anchor="end" fill="rgba(245,235,215,.95)" font-size="14" font-weight="600" font-family="Georgia, &quot;Songti SC&quot;, serif" letter-spacing="0.02em" pointer-events="none">福格行为模型</text></g></svg>
+  <div class="map-controls">
+    <button class="map-control-btn" data-action="in" title="放大">＋</button>
+    <button class="map-control-btn" data-action="out" title="缩小">−</button>
+    <button class="map-control-btn" data-action="reset" title="重置视图">⟲</button>
+  </div>
+  <div class="map-hint">
+    <span>拖拽移动</span>
+    <span>滚轮缩放</span>
+    <span><kbd>ESC</kbd> 返回</span>
+  </div>
+  <div class="tree-tooltip" id="treeTooltip"></div>
+</div>
+
+<div class="modal" id="modal">
+  <div class="modal-head">
+    <span class="modal-title" id="modalTitle"></span>
+    <span class="modal-cat" id="modalCat"></span>
+    <div class="modal-tabs">
+      <button class="modal-tab active" data-tab="note">读书笔记</button>
+      <button class="modal-tab" data-tab="axes">三板斧</button>
+    </div>
+    <button class="modal-close" id="modalClose">×</button>
+  </div>
+  <div class="modal-body" id="modalBody"></div>
+</div>
+
+<div class="upload-modal" id="uploadModal">
+  <div class="upload-box">
+    <h2>添加一本新书</h2>
+    <p class="sub">填写封面信息，上传读书笔记和三板斧的 HTML 文件。</p>
+    <div class="field"><label>书名 *</label><input type="text" id="upTitle" placeholder="例如：三体"></div>
+    <div class="field"><label>作者</label><input type="text" id="upAuthor" placeholder="选填"></div>
+    <div class="field-row-3">
+      <div class="field"><label>一级分类 *</label><select id="upCat"></select></div>
+      <div class="field"><label>二级分类</label><select id="upSubCat"></select></div>
+      <div class="field"><label>三级分类</label><select id="upSubCat2"></select></div>
+    </div>
+    <div class="field"><label>顶部小标签</label><input type="text" id="upTag" placeholder="例如：一本用寓言讲透经济学的入门书"></div>
+    <div class="field"><label>副标题</label><input type="text" id="upSub" placeholder="例如：鱼、美元和经济的故事"></div>
+    <div class="field"><label>金句</label><textarea id="upQuote" placeholder="例如：努力使有限的资源产生最大的效益…"></textarea></div>
+    <div class="field"><label>卡片配色（默认根据一级分类生成）</label><div class="theme-preview" id="themePreview">预览：<em>书名</em> · 副标题</div></div>
+    <div class="field"><label>读书笔记 HTML 文件</label><input type="file" id="upNote" accept=".html,.htm"></div>
+    <div class="field"><label>三板斧 HTML 文件</label><input type="file" id="upAxes" accept=".html,.htm"></div>
+    <div class="upload-actions">
+      <button class="secondary" id="upCancel">取消</button>
+      <button class="primary" id="upSubmit">保存</button>
+    </div>
+  </div>
+</div>
+
+<div class="toast" id="toast"></div>
+
+<script>
+/* =====================================================================
+   1. 分类树
+   ===================================================================== */
+const CATEGORY_TREE = {
+  '社科': {
+    color: { bgStart:'#7a1f1f', bgMid:'#a83232', bgEnd:'#c0523d', accent:'#f5d78e' },
+    children: [
+      { name: '心理学', children: [] },
+      { name: '沟通', children: [] },
+      { name: '人际关系', children: [] },
+      { name: '哲学', children: [] },
+    ]
+  },
+  '商业': {
+    color: { bgStart:'#1a0a2e', bgMid:'#3b1a6a', bgEnd:'#5b21b6', accent:'#f0d48a' },
+    children: [
+      { name: '理财', children: [] },
+      { name: '管理', children: [] },
+      { name: '谈判', children: [] },
+      { name: '经济', children: [] },
+    ]
+  },
+  '文学': {
+    color: { bgStart:'#3a2a0a', bgMid:'#7a5a1a', bgEnd:'#b8860b', accent:'#fff3c4' },
+    children: [
+      { name: '小说', children: ['科幻', '玄幻', '历史', '悬疑', '言情', '武侠', '寓言', '其他'] },
+      { name: '诗集', children: [] },
+      { name: '散文', children: [] },
+      { name: '传记', children: [] },
+    ]
+  },
+  '成长': {
+    color: { bgStart:'#0f1a2e', bgMid:'#1a3a5f', bgEnd:'#2a5f7a', accent:'#e8d4a0' },
+    children: [
+      { name: '认知', children: [] },
+      { name: '行为设计', children: [] },
+    ]
+  },
+  '其他': {
+    color: { bgStart:'#1a1a2e', bgMid:'#2d2d44', bgEnd:'#3a3a5a', accent:'#c0c0d8' },
+    children: []
+  }
+};
+
+/* =====================================================================
+   2. 内置书籍
+   ===================================================================== */
+const BUILTIN_BOOKS = [
+  { title:'我就是你啊', titleHtml:'我就是<em>你</em>啊', author:'皮埃尔·佩利西耶', category:'社科', subcategory:'沟通', subcategory2:'', bookTag:'一本关于沟通的寓言', subtitle:'走进他人内心的7项修炼', quote:'解释向来都是没用的，它们唯一的好处就是引发别人的反驳。', theme:{bgStart:'#7a1f1f',bgMid:'#a83232',bgEnd:'#c0523d',accent:'#f5d78e',glow:'rgba(255,255,255,.08)'} },
+  { title:'蛤蟆先生去看心理医生', titleHtml:'蛤蟆先生<br><em>去看心理医生</em>', author:'罗伯特·戴博德', category:'社科', subcategory:'心理学', subcategory2:'', bookTag:'一本心理咨询入门书', subtitle:'在人生的长河里，能摆渡你的只能是你自己', quote:'能将你摆渡过岸的，只能是你自己。', theme:{bgStart:'#1a3a2a',bgMid:'#2d5a42',bgEnd:'#3d7a58',accent:'#a8e0c0',glow:'rgba(255,255,255,.08)'} },
+  { title:'也许你该找个人聊聊', titleHtml:'也许你该<br><em>找个人聊聊</em>', author:'洛莉·戈特利布', category:'社科', subcategory:'心理学', subcategory2:'', bookTag:'一位心理治疗师的回忆录', subtitle:'把痛苦说出来，就是自我疗愈的开始', quote:'我们很难跟谁完全的告别，哪怕是死亡亦如是。', theme:{bgStart:'#1a2a3f',bgMid:'#2a4a6f',bgEnd:'#3a5f8a',accent:'#fbbf24',glow:'rgba(194,65,12,.14)'} },
+  { title:'被讨厌的勇气', titleHtml:'被讨厌的<br><em>勇气</em>', author:'岸见一郎 · 古贺史健', category:'社科', subcategory:'心理学', subcategory2:'', bookTag:'阿德勒心理学的哲学课', subtitle:'所谓自由，就是被别人讨厌', quote:'不畏惧被人讨厌而是勇往直前，这才是对人而言的自由。', theme:{bgStart:'#0f1a2e',bgMid:'#1a3a5f',bgEnd:'#2a5f7a',accent:'#f0d48a',glow:'rgba(201,152,44,.15)'} },
+  { title:'爱的五种语言', titleHtml:'爱的<em>五种语言</em>', author:'盖瑞·查普曼', category:'社科', subcategory:'人际关系', subcategory2:'', bookTag:'一本关于爱语的工具词典', subtitle:'让爱被听懂', quote:'让一个人感到被爱的东西，不一定会让另一个人也感到被爱。', theme:{bgStart:'#7a1f1f',bgMid:'#a83232',bgEnd:'#c0523d',accent:'#f5d78e',glow:'rgba(255,255,255,.08)'} },
+  { title:'当我们必须谈论死亡与别离时', titleHtml:'当我们必须谈论<br><em>死亡与别离时</em>', author:'凯瑟琳·曼尼克斯', category:'社科', subcategory:'沟通', subcategory2:'', bookTag:'一本关于温柔对话的沟通宝典', subtitle:'温柔地完成那些艰难的对话', quote:'怎么听比怎么说更重要。', theme:{bgStart:'#1a2e2a',bgMid:'#2a5f52',bgEnd:'#3a7a6a',accent:'#e8d4a0',glow:'rgba(255,255,255,.06)'} },
+  { title:'我离开之后', titleHtml:'我离开<br><em>之后</em>', author:'苏西·霍普金斯', category:'社科', subcategory:'沟通', subcategory2:'', bookTag:'一本母女共同书写的人生指南', subtitle:'那些来不及说的爱与牵挂', quote:'失去的本质就是教我们慢慢学会接受。', theme:{bgStart:'#1a2e35',bgMid:'#2a5f6a',bgEnd:'#3a7a82',accent:'#f0d48a',glow:'rgba(255,255,255,.06)'} },
+  { title:'哈佛经典谈判术', titleHtml:'哈佛<br><em>经典谈判术</em>', author:'迪帕克·马尔霍特拉', category:'商业', subcategory:'谈判', subcategory2:'', bookTag:'一本谈判实战手册', subtitle:'你一开口就赢麻了', quote:'谈判不是在谈判桌上开始的，而是在你坐下之前就已经定局了。', theme:{bgStart:'#0f1a2e',bgMid:'#1e3a5f',bgEnd:'#2a4a6f',accent:'#fbbf24',glow:'rgba(217,119,6,.14)'} },
+  { title:'第一性原理', titleHtml:'第一性<br><em>原理</em>', author:'李善友', category:'商业', subcategory:'管理', subcategory2:'', bookTag:'混沌学园创新必修教科书', subtitle:'任何理性系统的根基性命题', quote:'任何系统都有自己的基石假设，不能被缺省，也不能被违反。', theme:{bgStart:'#0f1a2e',bgMid:'#1a3a5f',bgEnd:'#2a5f7a',accent:'#e8d4a0',glow:'rgba(201,152,44,.15)'} },
+  { title:'富爸爸穷爸爸', titleHtml:'富爸爸<br><em>穷爸爸</em>', author:'罗伯特·清崎', category:'商业', subcategory:'理财', subcategory2:'', bookTag:'全球畅销 4100 万册的理财启蒙书', subtitle:'让金钱为你工作', quote:'穷人和中产阶级为钱而工作，富人让钱为他工作。', theme:{bgStart:'#1a0a2e',bgMid:'#3b1a6a',bgEnd:'#5b21b6',accent:'#f0d48a',glow:'rgba(212,160,23,.18)'} },
+  { title:'金钱心理学', titleHtml:'金钱<br><em>心理学</em>', author:'摩根·豪泽尔', category:'商业', subcategory:'理财', subcategory2:'', bookTag:'行为金融学经典', subtitle:'财富、人性和幸福的永恒真相', quote:'理财的成功与否和你的智商关系不大，但和你的行为习惯紧密相关。', theme:{bgStart:'#1a0a2e',bgMid:'#3b1a6a',bgEnd:'#5b21b6',accent:'#e8d4a0',glow:'rgba(212,160,23,.18)'} },
+  { title:'小岛经济学', titleHtml:'小岛<br><em>经济学</em>', author:'彼得·希夫 · 安德鲁·希夫', category:'商业', subcategory:'经济', subcategory2:'', bookTag:'一本用寓言讲透经济学的入门书', subtitle:'鱼、美元和经济的故事', quote:'努力使有限的资源产生最大的效益，这就是经济最简单的定义。', theme:{bgStart:'#0f1a2e',bgMid:'#1a3a5f',bgEnd:'#2a5f7a',accent:'#e8d4a0',glow:'rgba(201,152,44,.15)'} },
+  { title:'世界尽头的咖啡馆', titleHtml:'世界尽头的<br><em>咖啡馆</em>', author:'约翰·史崔勒基', category:'文学', subcategory:'小说', subcategory2:'寓言', bookTag:'一本关于人生意义的寓言', subtitle:'你为什么来这里？', quote:'生活本来就很精彩，只不过有人没发现自己是作者。', theme:{bgStart:'#0f1a2e',bgMid:'#1e3a5f',bgEnd:'#2a5f7a',accent:'#f0c96b',glow:'rgba(196,138,44,.15)'} },
+  { title:'动物农场', titleHtml:'动物<br><em>农场</em>', author:'乔治·奥威尔', category:'文学', subcategory:'小说', subcategory2:'寓言', bookTag:'一则政治讽喻寓言', subtitle:'所有动物一律平等，但有些动物更平等', quote:'凡靠两条腿行走者皆为仇敌。', theme:{bgStart:'#1a0a0a',bgMid:'#3d1010',bgEnd:'#5a1a1a',accent:'#e8c86a',glow:'rgba(201,152,44,.12)'} },
+  { title:'认知觉醒', titleHtml:'认知<em>觉醒</em>', author:'周岭', category:'成长', subcategory:'认知', subcategory2:'', bookTag:'一部个人成长方法论', subtitle:'开启自我改变的原动力', quote:'耐心不是毅力带来的结果，而是具有长远目光的结果。', theme:{bgStart:'#0f2a3f',bgMid:'#1e4a6f',bgEnd:'#2a5f8a',accent:'#fbbf24',glow:'rgba(194,65,12,.14)'} },
+  { title:'认知驱动', titleHtml:'认知<em>驱动</em>', author:'周岭', category:'成长', subcategory:'认知', subcategory2:'', bookTag:'《认知觉醒》姊妹篇', subtitle:'做成一件对他人很有用的事', quote:'你的一生至少要主动做成一件对他人很有用的事。', theme:{bgStart:'#0f1a2e',bgMid:'#1a3a5f',bgEnd:'#2a5f7a',accent:'#e8d4a0',glow:'rgba(201,168,76,.15)'} },
+  { title:'谁动了我的奶酪', titleHtml:'谁动了<br><em>我的奶酪</em>', author:'斯宾塞·约翰逊', category:'成长', subcategory:'认知', subcategory2:'', bookTag:'一本关于变化的寓言', subtitle:'一个在工作生活中处理变化的绝妙方法', quote:'如果不改变，你就会被淘汰。', theme:{bgStart:'#3a2a0a',bgMid:'#7a5a1a',bgEnd:'#b8860b',accent:'#fff3c4',glow:'rgba(255,255,255,.10)'} },
+  { title:'谁动了我的奶酪2：走出迷宫', titleHtml:'走出<br><em>迷宫</em>', author:'斯宾塞·约翰逊', category:'成长', subcategory:'认知', subcategory2:'', bookTag:'奶酪故事的续篇', subtitle:'一个走出困境的绝妙方法', quote:'你不是你的观念，你是选择自己观念的那个人。', theme:{bgStart:'#3a2a0a',bgMid:'#7a5a1a',bgEnd:'#b8860b',accent:'#fff3c4',glow:'rgba(44,95,138,.12)'} },
+  { title:'福格行为模型', titleHtml:'福格<br><em>行为模型</em>', author:'B.J. 福格', category:'成长', subcategory:'行为设计', subcategory2:'', bookTag:'行为设计学经典', subtitle:'让好习惯自然生长', quote:'行为可以被设计，不靠硬扛。', theme:{bgStart:'#2b2b2b',bgMid:'#3d3d3d',bgEnd:'#4a4a4a',accent:'#e07a5f',glow:'rgba(224,122,95,.14)'} },
+];
+
+/* =====================================================================
+   3. IndexedDB
+   ===================================================================== */
+const DB_NAME = 'private-library';
+const DB_VERSION = 1;
+const STORE_NAME = 'books';
+
+function openDB(){
+  return new Promise((resolve, reject) => {
+    const req = indexedDB.open(DB_NAME, DB_VERSION);
+    req.onupgradeneeded = e => {
+      const db = e.target.result;
+      if (!db.objectStoreNames.contains(STORE_NAME)) {
+        db.createObjectStore(STORE_NAME, { keyPath: 'id' });
+      }
+    };
+    req.onsuccess = e => resolve(e.target.result);
+    req.onerror = e => reject(e.target.error);
+  });
+}
+async function dbGetAll(){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readonly');
+    const req = tx.objectStore(STORE_NAME).getAll();
+    req.onsuccess = () => resolve(req.result || []);
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbPut(record){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const req = tx.objectStore(STORE_NAME).put(record);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+async function dbDelete(id){
+  const db = await openDB();
+  return new Promise((resolve, reject) => {
+    const tx = db.transaction(STORE_NAME, 'readwrite');
+    const req = tx.objectStore(STORE_NAME).delete(id);
+    req.onsuccess = () => resolve();
+    req.onerror = () => reject(req.error);
+  });
+}
+
+/* =====================================================================
+   4. 状态
+   ===================================================================== */
+let allBooks = [];
+let currentCat = '全部';
+let currentSubCat = null;
+let currentSubCat2 = null;
+let currentSearch = '';
+let currentBook = null;
+let currentTab = 'note';
+let hiddenBuiltins = [];
+let currentView = 'grid';
+
+/* =====================================================================
+   5. 辅助
+   ===================================================================== */
+function getCategoryColor(category){
+  const cat = CATEGORY_TREE[category];
+  return cat ? cat.color : CATEGORY_TREE['其他'].color;
+}
+function getCurrentCategoryColor(){
+  if (currentCat === '全部') return { bgStart:'#1a1a1a', bgMid:'#2b2b2b', bgEnd:'#3d3d3d', accent:'#e8c86a' };
+  return getCategoryColor(currentCat);
+}
+function findSub(cat, subName){
+  const c = CATEGORY_TREE[cat];
+  if (!c) return null;
+  return c.children.find(s => s.name === subName) || null;
+}
+function hexToRgba(hex, alpha){
+  const num = parseInt(hex.replace('#',''), 16);
+  return `rgba(${(num>>16)&0xFF},${(num>>8)&0xFF},${num&0xFF},${alpha})`;
+}
+function escapeHtml(str){
+  return String(str).replace(/[&<>"']/g, m => ({
+    '&':'&amp;','<':'&lt;','>':'&gt;','"':'&quot;',"'":'&#39;'
+  }[m]));
+}
+function escapeAttr(str){
+  return String(str).replace(/&/g, '&amp;').replace(/"/g, '&quot;').replace(/</g, '&lt;').replace(/>/g, '&gt;');
+}
+
+/* =====================================================================
+   6. 初始化
+   ===================================================================== */
+async function init(){
+  try { hiddenBuiltins = JSON.parse(localStorage.getItem('library-hidden') || '[]'); }
+  catch(e) { hiddenBuiltins = []; }
+
+  const uploaded = await dbGetAll();
+  allBooks = [
+    ...BUILTIN_BOOKS.map((b, i) => ({
+      id: 'builtin-' + i, ...b, isBuiltin: true,
+      noteContent: null, axesContent: null,
+    })),
+    ...uploaded.map(b => ({ ...b, isBuiltin: false })),
+  ];
+
+  renderNav();
+  render();
+  updateStats();
+  bindEvents();
+}
+
+/* =====================================================================
+   7. 导航
+   ===================================================================== */
+function renderNav(){
+  const mainRow = document.getElementById('navMain');
+  const subRow = document.getElementById('navSub');
+  const deepRow = document.getElementById('navDeep');
+
+  const cats = ['全部', ...Object.keys(CATEGORY_TREE)];
+  mainRow.innerHTML = cats.map(cat => {
+    const count = getBooksByCat(cat).length;
+    const hasChildren = cat !== '全部' && CATEGORY_TREE[cat] && CATEGORY_TREE[cat].children.length > 0;
+    const isActive = currentCat === cat;
+    const catColor = cat === '全部' ? { bgMid:'#2b2b2b' } : CATEGORY_TREE[cat].color;
+    const activeStyle = isActive
+      ? `background:${catColor.bgMid}; color:#fff; border-color:${catColor.bgMid}; box-shadow:0 4px 12px ${hexToRgba(catColor.bgMid, 0.25)};`
+      : '';
+    return `<button class="cat-btn ${isActive ? 'active' : ''}" data-cat="${cat}" style="${activeStyle}">
+      ${cat}<span class="cnt" ${isActive ? 'style="background:rgba(255,255,255,.2); opacity:1"' : ''}>${count}</span>
+      ${hasChildren ? `<span class="arrow">›</span>` : ''}
+    </button>`;
+  }).join('');
+
+  const subs = (currentCat !== '全部' && CATEGORY_TREE[currentCat]) ? CATEGORY_TREE[currentCat].children : [];
+  const currentColor = getCurrentCategoryColor();
+
+  if (subs.length > 0) {
+    subRow.style.display = 'flex';
+    const allActive = currentSubCat === null;
+    const allActiveStyle = allActive
+      ? `background:${currentColor.bgMid}; color:#fff; border-color:${currentColor.bgMid}; box-shadow:0 3px 10px ${hexToRgba(currentColor.bgMid, 0.2)};` : '';
+    subRow.innerHTML = `<button class="cat-btn sub-btn ${allActive ? 'active' : ''}" data-subcat="" style="${allActiveStyle}">全部</button>` +
+      subs.map(sub => {
+        const count = getBooksBySubCat(currentCat, sub.name).length;
+        const hasDeep = sub.children && sub.children.length > 0;
+        const isActive = currentSubCat === sub.name;
+        const activeStyle = isActive
+          ? `background:${currentColor.bgMid}; color:#fff; border-color:${currentColor.bgMid}; box-shadow:0 3px 10px ${hexToRgba(currentColor.bgMid, 0.2)};` : '';
+        return `<button class="cat-btn sub-btn ${isActive ? 'active' : ''}" data-subcat="${sub.name}" style="${activeStyle}">
+          ${sub.name}<span class="cnt" ${isActive ? 'style="background:rgba(255,255,255,.2); opacity:1"' : ''}>${count}</span>
+          ${hasDeep ? `<span class="arrow">›</span>` : ''}
+        </button>`;
+      }).join('');
+  } else {
+    subRow.style.display = 'none';
+    currentSubCat = null;
+  }
+
+  let deepChildren = [];
+  if (currentCat !== '全部' && currentSubCat) {
+    const sub = findSub(currentCat, currentSubCat);
+    if (sub && sub.children && sub.children.length > 0) deepChildren = sub.children;
+  }
+
+  if (deepChildren.length > 0) {
+    deepRow.style.display = 'flex';
+    const allActive = currentSubCat2 === null;
+    const allActiveStyle = allActive
+      ? `background:${currentColor.bgEnd}; color:#fff; border-color:${currentColor.bgEnd}; box-shadow:0 3px 10px ${hexToRgba(currentColor.bgEnd, 0.2)};` : '';
+    deepRow.innerHTML = `<button class="cat-btn deep-btn ${allActive ? 'active' : ''}" data-subcat2="" style="${allActiveStyle}">全部</button>` +
+      deepChildren.map(name => {
+        const count = getBooksBySubCat2(currentCat, currentSubCat, name).length;
+        const isActive = currentSubCat2 === name;
+        const activeStyle = isActive
+          ? `background:${currentColor.bgEnd}; color:#fff; border-color:${currentColor.bgEnd}; box-shadow:0 3px 10px ${hexToRgba(currentColor.bgEnd, 0.2)};` : '';
+        return `<button class="cat-btn deep-btn ${isActive ? 'active' : ''}" data-subcat2="${name}" style="${activeStyle}">
+          ${name}<span class="cnt" ${isActive ? 'style="background:rgba(255,255,255,.2); opacity:1"' : ''}>${count}</span>
+        </button>`;
+      }).join('');
+  } else {
+    deepRow.style.display = 'none';
+    currentSubCat2 = null;
+  }
+}
+
+function getBooksByCat(cat){
+  let list = allBooks.filter(b => !b.hidden && !(b.isBuiltin && hiddenBuiltins.includes(b.id)));
+  if (cat !== '全部') list = list.filter(b => b.category === cat);
+  return list;
+}
+function getBooksBySubCat(cat, subcat){ return getBooksByCat(cat).filter(b => b.subcategory === subcat); }
+function getBooksBySubCat2(cat, subcat, subcat2){ return getBooksBySubCat(cat, subcat).filter(b => b.subcategory2 === subcat2); }
+function getVisibleBooks(){
+  let list = getBooksByCat(currentCat);
+  if (currentSubCat) list = list.filter(b => b.subcategory === currentSubCat);
+  if (currentSubCat2) list = list.filter(b => b.subcategory2 === currentSubCat2);
+  if (currentSearch.trim()) {
+    const q = currentSearch.trim().toLowerCase();
+    list = list.filter(b => b.title.toLowerCase().includes(q) || (b.author || '').toLowerCase().includes(q));
+  }
+  return list;
+}
+
+/* =====================================================================
+   8. 网格视图
+   ===================================================================== */
+function render(){
+  const main = document.getElementById('main');
+  const books = getVisibleBooks();
+  if (!books.length) {
+    main.innerHTML = `
+      <div style="text-align:center; padding:100px 20px; color:var(--muted)">
+        <div style="font-size:2.5rem; margin-bottom:16px; opacity:.25; font-family:Georgia,serif">∅</div>
+        <p style="font-family:Georgia,serif; font-style:italic">没有找到符合条件的书籍</p>
+      </div>`;
+    return;
+  }
+
+  let isDeepest = false;
+  if (currentCat === '全部') isDeepest = false;
+  else if (!currentSubCat) {
+    const cat = CATEGORY_TREE[currentCat];
+    isDeepest = !cat || cat.children.length === 0;
+  } else if (!currentSubCat2) {
+    const sub = findSub(currentCat, currentSubCat);
+    isDeepest = !sub || sub.children.length === 0;
+  } else isDeepest = true;
+
+  if (isDeepest) {
+    const parts = [currentCat];
+    if (currentSubCat) parts.push(currentSubCat);
+    if (currentSubCat2) parts.push(currentSubCat2);
+    let html = `
+      <div class="section-header">
+        <div class="section-num">·</div>
+        <div class="section-title">${parts.join(' · ')}</div>
+        <div class="section-line"></div>
+        <div class="section-count">${books.length} 本</div>
+      </div>
+      <div class="grid">`;
+    books.forEach(b => html += renderBookCard(b));
+    html += `</div>`;
+    main.innerHTML = html;
+    return;
+  }
+
+  let html = '';
+  let sectionIndex = 1;
+
+  if (currentCat === '全部') {
+    Object.keys(CATEGORY_TREE).forEach(cat => {
+      const catBooks = books.filter(b => b.category === cat);
+      if (!catBooks.length) return;
+      const idx = String(sectionIndex).padStart(2, '0');
+      html += `
+        <div class="section-header">
+          <div class="section-num">${idx}</div>
+          <div class="section-title">${cat}</div>
+          <div class="section-line"></div>
+          <div class="section-count">${catBooks.length} 本</div>
+        </div>`;
+      html += renderSubGroups(cat, catBooks);
+      sectionIndex++;
+    });
+  } else {
+    const idx = String(sectionIndex).padStart(2, '0');
+    html += `
+      <div class="section-header">
+        <div class="section-num">${idx}</div>
+        <div class="section-title">${currentCat}</div>
+        <div class="section-line"></div>
+        <div class="section-count">${books.length} 本</div>
+      </div>`;
+    html += renderSubGroups(currentCat, books);
+  }
+  main.innerHTML = html;
+}
+
+function renderSubGroups(cat, catBooks){
+  const subs = CATEGORY_TREE[cat] ? CATEGORY_TREE[cat].children : [];
+  const grouped = {};
+  catBooks.forEach(b => {
+    const key = b.subcategory || '未分类';
+    if (!grouped[key]) grouped[key] = [];
+    grouped[key].push(b);
+  });
+  const subOrder = [
+    ...subs.filter(s => grouped[s.name]).map(s => s.name),
+    ...Object.keys(grouped).filter(k => !subs.some(s => s.name === k)),
+  ];
+  let html = '';
+  subOrder.forEach(subName => {
+    const subBooks = grouped[subName];
+    if (!subBooks || !subBooks.length) return;
+    const sub = subs.find(s => s.name === subName);
+    const hasDeep = sub && sub.children && sub.children.length > 0;
+    html += `<div class="sub-header">
+      <div class="sub-header-label">${subName}</div>
+      <div class="sub-header-line"></div>
+      <div class="sub-header-count">${subBooks.length} 本</div>
+    </div>`;
+    if (hasDeep) {
+      const grouped2 = {};
+      subBooks.forEach(b => {
+        const key = b.subcategory2 || '未分类';
+        if (!grouped2[key]) grouped2[key] = [];
+        grouped2[key].push(b);
+      });
+      const sub2Order = [
+        ...sub.children.filter(c => grouped2[c]),
+        ...Object.keys(grouped2).filter(k => !sub.children.includes(k)),
+      ];
+      sub2Order.forEach(sub2Name => {
+        const sub2Books = grouped2[sub2Name];
+        if (!sub2Books || !sub2Books.length) return;
+        html += `<div class="deep-header">
+          <div class="deep-header-label">${sub2Name}</div>
+          <div class="deep-header-count">${sub2Books.length}</div>
+        </div>`;
+        html += `<div class="grid">`;
+        sub2Books.forEach(b => html += renderBookCard(b));
+        html += `</div>`;
+      });
+    } else {
+      html += `<div class="grid">`;
+      subBooks.forEach(b => html += renderBookCard(b));
+      html += `</div>`;
+    }
+  });
+  return html;
+}
+
+function renderBookCard(b){
+  const t = b.theme || getCategoryColor(b.category);
+  const styleVars = `
+    --bg-start: ${t.bgStart};
+    --bg-mid: ${t.bgMid};
+    --bg-end: ${t.bgEnd};
+    --accent: ${t.accent};
+    --glow: ${t.glow || 'rgba(255,255,255,.08)'};
+  `;
+  const titleHtml = b.titleHtml || escapeHtml(b.title);
+  return `
+    <div class="book-card" data-id="${b.id}" style="${styleVars}">
+      <div class="book-spine"></div>
+      ${!b.isBuiltin ? `<button class="card-del" data-del="${b.id}" title="删除">×</button>` : ''}
+      ${b.bookTag ? `<div class="card-tag">${escapeHtml(b.bookTag)}</div>` : ''}
+      <div class="card-title">${titleHtml}</div>
+      ${b.subtitle ? `<div class="card-sub">${escapeHtml(b.subtitle)}</div>` : ''}
+      ${b.quote ? `
+        <div class="card-quote-mark">"</div>
+        <div class="card-quote">${escapeHtml(b.quote)}</div>
+      ` : ''}
+      ${b.author ? `<div class="card-author">—— ${escapeHtml(b.author)}</div>` : ''}
+      <div class="card-cta">打开 →</div>
+    </div>`;
+}
+
+function updateStats(){
+  const visible = allBooks.filter(b => !b.hidden && !(b.isBuiltin && hiddenBuiltins.includes(b.id)));
+  document.getElementById('statTotal').textContent = visible.length;
+  document.getElementById('statNote').textContent = visible.filter(b => b.isBuiltin || b.noteContent).length;
+  document.getElementById('statAxes').textContent = visible.filter(b => b.isBuiltin || b.axesContent).length;
+}
+
+/* =====================================================================
+   9. 思维导图 —— 极坐标 + 自动双圈交错
+   ===================================================================== */
+/* =====================================================================
+   ★★★ 思维导图布局参数（可调）★★★
+   ---------------------------------------------------------------------
+   如果之后书籍变多、思维导图显得拥挤，优先调这几个值：
+
+   R1            一级分类节点所在的圆半径（离中心的距离）
+   R2            二级分类节点所在的圆半径
+   R3_INNER      书籍内圈半径
+   R3_OUTER      书籍外圈半径
+                 → R3_OUTER - R3_INNER 是内外圈的错开距离，
+                   书挤的时候可以把这个差值调大（比如 100~120）
+
+   ANGLE_THRESHOLD   相邻两本书的角度差小于此值，就自动分到
+                     另一个圈层，避免叠在一起。
+                     → 书变多、角度更密时，把这个值调大
+                       （比如 9 → 12），交错会更频繁
+
+   调参建议：
+   - 只是某处两本书叠了：把 ANGLE_THRESHOLD 加 1~2
+   - 整体都显挤：把 R3_OUTER 加 40~80，或再加一档外圈
+   - 书名开始重叠：把整个画布 MAP_W / MAP_H 同比放大
+   ===================================================================== */
+
+const SVG_NS = 'http://www.w3.org/2000/svg';
+const MAP_W = 1700;
+const MAP_H = 1500;
+const CX = MAP_W / 2;
+const CY = MAP_H / 2;
+const R1 = 240;
+const R2 = 460;
+const R3_INNER = 640;
+const R3_OUTER = 730;
+const ANGLE_THRESHOLD = 9; // 相邻书角度差小于此值则交错半径
+
+let viewState = { x: 0, y: 0, scale: 1 };
+let isDragging = false;
+let dragMoved = false;
+let dragStart = { x: 0, y: 0 };
+let viewStart = { x: 0, y: 0 };
+
+function svgEl(tag, attrs){
+  const el = document.createElementNS(SVG_NS, tag);
+  for (const k in attrs) el.setAttribute(k, attrs[k]);
+  return el;
+}
+function polar(r, angleDeg){
+  const rad = angleDeg * Math.PI / 180;
+  return { x: CX + r * Math.cos(rad), y: CY + r * Math.sin(rad) };
+}
+function applyTransform(){
+  const g = document.getElementById('mapContent');
+  if (!g) return;
+  g.setAttribute('transform', `translate(${viewState.x}, ${viewState.y}) scale(${viewState.scale})`);
+}
+function drawCurve(parent, x1, y1, x2, y2, color, width, opacity){
+  const mx = (x1 + x2) / 2;
+  const path = svgEl('path', {
+    d: `M ${x1} ${y1} C ${mx} ${y1}, ${mx} ${y2}, ${x2} ${y2}`,
+    stroke: color,
+    'stroke-width': width,
+    fill: 'none',
+    'stroke-linecap': 'round',
+    opacity: opacity,
+  });
+  parent.appendChild(path);
+}
+function drawRoundedNode(parent, x, y, w, h, r, fill, stroke, textLines, textColor, options = {}){
+  const group = svgEl('g', {});
+  if (options.glow) {
+    group.appendChild(svgEl('rect', {
+      x: x - w/2 - 4, y: y - h/2 - 4, width: w + 8, height: h + 8,
+      rx: r + 4, ry: r + 4, fill: options.glow, opacity: 0.35,
+      filter: 'url(#mapSoftGlow)',
+    }));
+  }
+  group.appendChild(svgEl('rect', {
+    x: x - w/2, y: y - h/2, width: w, height: h,
+    rx: r, ry: r, fill: fill, stroke: stroke, 'stroke-width': 1,
+  }));
+  const lineHeight = options.lineHeight || 14;
+  const startY = y - ((textLines.length - 1) * lineHeight) / 2;
+  textLines.forEach((line, i) => {
+    const text = svgEl('text', {
+      x: x, y: startY + i * lineHeight + 4,
+      'text-anchor': 'middle', fill: textColor,
+      'font-size': options.fontSize || 12,
+      'font-weight': options.fontWeight || 600,
+      'font-family': options.fontFamily || 'Georgia, "Songti SC", serif',
+      'letter-spacing': options.letterSpacing || '0.02em',
+      'pointer-events': 'none',
+    });
+    text.textContent = line;
+    group.appendChild(text);
+  });
+  parent.appendChild(group);
+}
+
+function renderMindMap(){
+  const svg = document.getElementById('treeSvg');
+  svg.innerHTML = '';
+  svg.setAttribute('viewBox', `0 0 ${MAP_W} ${MAP_H}`);
+  svg.setAttribute('preserveAspectRatio', 'xMidYMid meet');
+
+  const defs = svgEl('defs', {});
+  defs.innerHTML = `
+    <radialGradient id="mapBg" cx="50%" cy="50%" r="75%">
+      <stop offset="0%" stop-color="#1a2434"/>
+      <stop offset="55%" stop-color="#0e1622"/>
+      <stop offset="100%" stop-color="#060a12"/>
+    </radialGradient>
+    <filter id="mapSoftGlow" x="-50%" y="-50%" width="200%" height="200%">
+      <feGaussianBlur stdDeviation="6"/>
+    </filter>
+  `;
+  svg.appendChild(defs);
+
+  svg.appendChild(svgEl('rect', {
+    x: 0, y: 0, width: MAP_W, height: MAP_H, fill: 'url(#mapBg)'
+  }));
+
+  const seededRand = (i) => {
+    const x = Math.sin(i * 12.9898) * 43758.5453;
+    return x - Math.floor(x);
+  };
+  for (let i = 0; i < 200; i++) {
+    const x = seededRand(i * 1.1) * MAP_W;
+    const y = seededRand(i * 2.3) * MAP_H;
+    const r = 0.4 + seededRand(i * 3.7) * 1.0;
+    const o = 0.06 + seededRand(i * 5.1) * 0.3;
+    svg.appendChild(svgEl('circle', { cx: x, cy: y, r: r, fill: '#ffffff', opacity: o }));
+  }
+
+  const content = svgEl('g', { id: 'mapContent' });
+  svg.appendChild(content);
+
+  // 中心光晕
+  content.appendChild(svgEl('circle', {
+    cx: CX, cy: CY, r: 100, fill: '#e8c86a', opacity: 0.09,
+    filter: 'url(#mapSoftGlow)',
+  }));
+
+  drawRoundedNode(content, CX, CY, 220, 76, 38, '#1a1a1a', '#e8c86a',
+    ['Brook的图书馆'], '#e8c86a', {
+      fontSize: 20, fontWeight: 400, lineHeight: 22,
+      fontFamily: 'Georgia, "Songti SC", serif',
+      glow: 'rgba(232,200,106,.3)',
+    }
+  );
+
+  const visibleBooks = getVisibleBooks();
+  const centerSub = svgEl('text', {
+    x: CX, y: CY + 52, 'text-anchor': 'middle',
+    fill: 'rgba(232,200,106,.55)', 'font-size': 11,
+    'letter-spacing': '0.15em', 'font-family': 'Georgia, serif',
+    'font-style': 'italic', 'pointer-events': 'none',
+  });
+  centerSub.textContent = `· ${visibleBooks.length} 本藏书 ·`;
+  content.appendChild(centerSub);
+
+  const byCat = {};
+  visibleBooks.forEach(b => {
+    if (!byCat[b.category]) byCat[b.category] = {};
+    const sub = b.subcategory || '未分类';
+    if (!byCat[b.category][sub]) byCat[b.category][sub] = [];
+    byCat[b.category][sub].push(b);
+  });
+
+  const validCats = Object.keys(byCat).filter(c => Object.keys(byCat[c]).length > 0);
+  if (validCats.length === 0) { applyTransform(); return; }
+
+  const N = validCats.length;
+  const catRange = 360 / N;
+
+  // 收集所有布局信息
+  const catLayouts = [];
+  const subLayouts = [];
+  const bookLayouts = [];
+
+  validCats.forEach((cat, catIdx) => {
+    const catStartAngle = -180 + catIdx * catRange;
+    const catEndAngle = catStartAngle + catRange;
+    const catCenterAngle = (catStartAngle + catEndAngle) / 2;
+    const catColor = getCategoryColor(cat);
+    const subs = Object.keys(byCat[cat]);
+    const totalInCat = subs.reduce((s, name) => s + byCat[cat][name].length, 0);
+    const catPos = polar(R1, catCenterAngle);
+
+    catLayouts.push({ cat, catPos, catColor, totalInCat });
+
+    const anglePerBook = catRange / totalInCat;
+    let cursorAngle = catStartAngle;
+
+    subs.forEach(subName => {
+      const books = byCat[cat][subName];
+      const K = books.length;
+      const subRange = K * anglePerBook;
+      const subCenterAngle = cursorAngle + subRange / 2;
+      const subPos = polar(R2, subCenterAngle);
+
+      subLayouts.push({ cat, subName, subPos, catColor, K });
+
+      books.forEach((book, i) => {
+        const bookAngle = cursorAngle + (i + 0.5) * anglePerBook;
+        bookLayouts.push({
+          book, cat, subName, catColor, subPos, bookAngle,
+        });
+      });
+
+      cursorAngle += subRange;
+    });
+  });
+
+  // 全局按角度排序，交错分配半径
+  bookLayouts.sort((a, b) => a.bookAngle - b.bookAngle);
+  let prevAngle = -Infinity;
+  let currentRadiusIdx = 0;
+  bookLayouts.forEach(item => {
+    if (item.bookAngle - prevAngle < ANGLE_THRESHOLD) {
+      currentRadiusIdx = 1 - currentRadiusIdx;
+    } else {
+      currentRadiusIdx = 0;
+    }
+    item.radius = (currentRadiusIdx === 0) ? R3_INNER : R3_OUTER;
+    prevAngle = item.bookAngle;
+  });
+
+  // ===== 绘制 =====
+
+  // 中心 → 一级
+  catLayouts.forEach(({ cat, catPos, catColor, totalInCat }) => {
+    drawCurve(content, CX, CY, catPos.x, catPos.y, catColor.bgMid, 3, 0.55);
+  });
+
+  // 一级节点
+  catLayouts.forEach(({ cat, catPos, catColor, totalInCat }) => {
+    const catW = Math.max(100, cat.length * 22 + 40);
+    drawRoundedNode(content, catPos.x, catPos.y, catW, 48, 24,
+      catColor.bgMid, catColor.accent, [cat], '#fff', {
+        fontSize: 16, fontWeight: 700, lineHeight: 17,
+        letterSpacing: '0.1em',
+        glow: hexToRgba(catColor.bgMid, 0.5),
+      }
+    );
+    const catCountText = svgEl('text', {
+      x: catPos.x, y: catPos.y + 32, 'text-anchor': 'middle',
+      fill: catColor.accent, 'font-size': 10, opacity: 0.65,
+      'letter-spacing': '0.15em', 'font-family': 'Georgia, serif',
+      'font-style': 'italic', 'pointer-events': 'none',
+    });
+    catCountText.textContent = `${totalInCat} 本`;
+    content.appendChild(catCountText);
+  });
+
+  // 一级 → 二级
+  subLayouts.forEach(({ cat, subPos, catColor }) => {
+    const catLayout = catLayouts.find(c => c.cat === cat);
+    if (!catLayout) return;
+    drawCurve(content, catLayout.catPos.x, catLayout.catPos.y, subPos.x, subPos.y, catColor.bgEnd, 2.2, 0.55);
+  });
+
+  // 二级节点
+  subLayouts.forEach(({ subName, subPos, catColor, K }) => {
+    const subW = Math.max(64, subName.length * 15 + 24);
+    drawRoundedNode(content, subPos.x, subPos.y, subW, 32, 16,
+      'rgba(20,30,45,.85)', catColor.accent,
+      [subName], 'rgba(240,232,212,.9)', {
+        fontSize: 13, fontWeight: 600, lineHeight: 14,
+        letterSpacing: '0.04em',
+      }
+    );
+    const subCountText = svgEl('text', {
+      x: subPos.x, y: subPos.y + 22, 'text-anchor': 'middle',
+      fill: 'rgba(255,255,255,.45)', 'font-size': 9,
+      'letter-spacing': '0.1em', 'font-family': 'Georgia, serif',
+      'pointer-events': 'none',
+    });
+    subCountText.textContent = `${K}`;
+    content.appendChild(subCountText);
+  });
+
+  // 二级 → 书籍（加粗、提高对比）
+  bookLayouts.forEach(({ catColor, subPos, bookAngle, radius }) => {
+    const bookPos = polar(radius, bookAngle);
+    drawCurve(content, subPos.x, subPos.y, bookPos.x, bookPos.y, catColor.bgEnd, 1.4, 0.55);
+  });
+
+  // 书籍
+  bookLayouts.forEach(({ book, catColor, bookAngle, radius }) => {
+    const bookPos = polar(radius, bookAngle);
+    const bookColor = book.theme ? book.theme.accent : catColor.accent;
+
+    content.appendChild(svgEl('circle', {
+      cx: bookPos.x, cy: bookPos.y, r: 18,
+      fill: bookColor, opacity: 0.2,
+      filter: 'url(#mapSoftGlow)',
+      'pointer-events': 'none',
+    }));
+
+    const fruit = svgEl('circle', {
+      cx: bookPos.x, cy: bookPos.y, r: 11,
+      fill: bookColor,
+      stroke: 'rgba(255,255,255,.55)',
+      'stroke-width': 1.3,
+      class: 'map-fruit',
+      'data-book-id': book.id,
+    });
+    content.appendChild(fruit);
+
+    content.appendChild(svgEl('circle', {
+      cx: bookPos.x - 3, cy: bookPos.y - 3, r: 3,
+      fill: 'rgba(255,255,255,.75)',
+      'pointer-events': 'none',
+    }));
+
+    const isRight = Math.cos(bookAngle * Math.PI / 180) > 0;
+    const titleOffset = isRight ? 19 : -19;
+    const anchor = isRight ? 'start' : 'end';
+
+    const title = svgEl('text', {
+      x: bookPos.x + titleOffset,
+      y: bookPos.y + 5,
+      'text-anchor': anchor,
+      fill: 'rgba(245,235,215,.95)',
+      'font-size': 14,
+      'font-weight': 600,
+      'font-family': 'Georgia, "Songti SC", serif',
+      'letter-spacing': '0.02em',
+      'pointer-events': 'none',
+    });
+    const shortTitle = book.title.length > 12 ? book.title.slice(0, 11) + '…' : book.title;
+    title.textContent = shortTitle;
+    content.appendChild(title);
+
+    fruit.addEventListener('mouseenter', (e) => {
+      fruit.setAttribute('r', 15);
+      showTooltip(e, book);
+    });
+    fruit.addEventListener('mousemove', moveTooltip);
+    fruit.addEventListener('mouseleave', () => {
+      fruit.setAttribute('r', 11);
+      hideTooltip();
+    });
+    fruit.addEventListener('click', (e) => {
+      if (dragMoved) return;
+      e.stopPropagation();
+      openBook(book.id);
+    });
+  });
+
+  applyTransform();
+}
+
+/* =====================================================================
+   10. 拖拽缩放
+   ===================================================================== */
+function setupMapInteraction(){
+  const svg = document.getElementById('treeSvg');
+
+  svg.addEventListener('mousedown', (e) => {
+    if (e.button !== 0) return;
+    isDragging = true;
+    dragMoved = false;
+    dragStart = { x: e.clientX, y: e.clientY };
+    viewStart = { x: viewState.x, y: viewState.y };
+    svg.classList.add('dragging');
+    e.preventDefault();
+  });
+
+  window.addEventListener('mousemove', (e) => {
+    if (!isDragging) return;
+    const dx = e.clientX - dragStart.x;
+    const dy = e.clientY - dragStart.y;
+    if (Math.abs(dx) > 3 || Math.abs(dy) > 3) dragMoved = true;
+    if (dragMoved) {
+      viewState.x = viewStart.x + dx;
+      viewState.y = viewStart.y + dy;
+      applyTransform();
+    }
+  });
+
+  window.addEventListener('mouseup', () => {
+    if (!isDragging) return;
+    isDragging = false;
+    svg.classList.remove('dragging');
+    setTimeout(() => { dragMoved = false; }, 10);
+  });
+
+  svg.addEventListener('wheel', (e) => {
+    e.preventDefault();
+    const pt = svg.createSVGPoint();
+    pt.x = e.clientX;
+    pt.y = e.clientY;
+    const ctm = svg.getScreenCTM();
+    if (!ctm) return;
+    const svgP = pt.matrixTransform(ctm.inverse());
+    const mx = svgP.x;
+    const my = svgP.y;
+
+    const oldScale = viewState.scale;
+    const delta = e.deltaY > 0 ? 0.9 : 1.1;
+    const newScale = Math.max(0.3, Math.min(4, oldScale * delta));
+    const ratio = newScale / oldScale;
+
+    viewState.x = mx - (mx - viewState.x) * ratio;
+    viewState.y = my - (my - viewState.y) * ratio;
+    viewState.scale = newScale;
+    applyTransform();
+  }, { passive: false });
+
+  document.querySelectorAll('.map-control-btn').forEach(btn => {
+    btn.addEventListener('click', () => {
+      const action = btn.dataset.action;
+      if (action === 'reset') {
+        viewState = { x: 0, y: 0, scale: 1 };
+        applyTransform();
+        return;
+      }
+      const oldScale = viewState.scale;
+      const delta = action === 'in' ? 1.2 : 1/1.2;
+      const newScale = Math.max(0.3, Math.min(4, oldScale * delta));
+      const ratio = newScale / oldScale;
+      const anchorX = MAP_W / 2;
+      const anchorY = MAP_H / 2;
+      viewState.x = anchorX - (anchorX - viewState.x) * ratio;
+      viewState.y = anchorY - (anchorY - viewState.y) * ratio;
+      viewState.scale = newScale;
+      applyTransform();
+    });
+  });
+}
+
+/* =====================================================================
+   11. Tooltip
+   ===================================================================== */
+const tooltipEl = document.getElementById('treeTooltip');
+function showTooltip(e, book){
+  const t = book.theme || getCategoryColor(book.category);
+  tooltipEl.innerHTML = `
+    <div class="tt-title">${escapeHtml(book.title)}</div>
+    ${book.author ? `<div class="tt-author">${escapeHtml(book.author)}</div>` : ''}
+    ${book.quote ? `<div class="tt-quote">${escapeHtml(book.quote)}</div>` : ''}
+    <div class="tt-hint">点击打开 →</div>
+  `;
+  tooltipEl.style.borderColor = hexToRgba(t.accent, 0.5);
+  tooltipEl.classList.add('show');
+  moveTooltip(e);
+}
+function moveTooltip(e){
+  tooltipEl.style.left = e.clientX + 'px';
+  tooltipEl.style.top = e.clientY + 'px';
+}
+function hideTooltip(){ tooltipEl.classList.remove('show'); }
+
+/* =====================================================================
+   12. 视图切换
+   ===================================================================== */
+function showTreeView(){
+  currentView = 'tree';
+  viewState = { x: 0, y: 0, scale: 1 };
+  document.getElementById('treeView').classList.add('active');
+  document.body.style.overflow = 'hidden';
+  renderMindMap();
+}
+function showGridView(){
+  currentView = 'grid';
+  document.getElementById('treeView').classList.remove('active');
+  document.body.style.overflow = '';
+  hideTooltip();
+}
+
+/* =====================================================================
+   13. 详情弹窗
+   ===================================================================== */
+function openBook(id){
+  const book = allBooks.find(b => b.id === id);
+  if (!book) return;
+  currentBook = book;
+  currentTab = 'note';
+  document.getElementById('modalTitle').textContent = book.title;
+  const catParts = [book.category];
+  if (book.subcategory) catParts.push(book.subcategory);
+  if (book.subcategory2) catParts.push(book.subcategory2);
+  document.getElementById('modalCat').textContent = catParts.join(' · ');
+  document.querySelectorAll('.modal-tab').forEach(t => {
+    t.classList.toggle('active', t.dataset.tab === 'note');
+  });
+  renderModalBody();
+  document.getElementById('modal').classList.add('open');
+  hideTooltip();
+}
+
+function renderModalBody(){
+  const body = document.getElementById('modalBody');
+  const book = currentBook;
+  if (!book) return;
+  const isNote = currentTab === 'note';
+  const content = isNote ? book.noteContent : book.axesContent;
+  if (content) {
+    body.innerHTML = `<iframe srcdoc="${escapeAttr(content)}"></iframe>`;
+    return;
+  }
+  if (book.isBuiltin) {
+    const path = isNote
+      ? `notes/《${book.title}》· 读书笔记.html`
+      : `axes/《${book.title}》· 读书三板斧拆解.html`;
+    body.innerHTML = `<iframe src="${path}"></iframe>`;
+    const iframe = body.querySelector('iframe');
+    setTimeout(() => {
+      try {
+        const doc = iframe.contentDocument;
+        if (!doc || !doc.body || doc.body.innerHTML.trim() === '') showEmpty(book, isNote, path);
+      } catch(e) {}
+    }, 600);
+    return;
+  }
+  showEmpty(book, isNote, '');
+}
+
+function showEmpty(book, isNote, path){
+  const body = document.getElementById('modalBody');
+  const typeName = isNote ? '读书笔记' : '三板斧';
+  body.innerHTML = `
+    <div class="modal-empty">
+      <div class="icon">📄</div>
+      <h3>还没有绑定${typeName}</h3>
+      <p>把对应的 HTML 文件放到约定路径，或点击下方按钮上传覆盖。</p>
+      ${path ? `<div class="path">${path}</div>` : ''}
+      <button class="action-btn" onclick="uploadForCurrent('${isNote ? 'note' : 'axes'}')">
+        上传${typeName} HTML
+      </button>
+    </div>`;
+}
+
+/* =====================================================================
+   14. 上传当前书籍内容
+   ===================================================================== */
+function uploadForCurrent(type){
+  const book = currentBook;
+  if (!book) return;
+  const input = document.createElement('input');
+  input.type = 'file';
+  input.accept = '.html,.htm';
+  input.onchange = async () => {
+    const file = input.files[0];
+    if (!file) return;
+    const content = await file.text();
+    if (type === 'note') book.noteContent = content;
+    else book.axesContent = content;
+    await dbPut({
+      id: book.id, title: book.title, titleHtml: book.titleHtml,
+      author: book.author, category: book.category,
+      subcategory: book.subcategory, subcategory2: book.subcategory2,
+      bookTag: book.bookTag, subtitle: book.subtitle, quote: book.quote,
+      theme: book.theme,
+      noteContent: book.noteContent, axesContent: book.axesContent,
+      isBuiltin: book.isBuiltin, overridden: true,
+    });
+    toast(`已上传${type === 'note' ? '读书笔记' : '三板斧'}`);
+    renderModalBody();
+    updateStats();
+    if (currentView === 'tree') renderMindMap();
+  };
+  input.click();
+}
+
+/* =====================================================================
+   15. 添加书籍
+   ===================================================================== */
+function openUpload(){
+  document.getElementById('upTitle').value = '';
+  document.getElementById('upAuthor').value = '';
+  document.getElementById('upTag').value = '';
+  document.getElementById('upSub').value = '';
+  document.getElementById('upQuote').value = '';
+  document.getElementById('upNote').value = '';
+  document.getElementById('upAxes').value = '';
+  const catSelect = document.getElementById('upCat');
+  catSelect.innerHTML = Object.keys(CATEGORY_TREE).map(c => `<option value="${c}">${c}</option>`).join('');
+  updateSubCatOptions();
+  updateThemePreview();
+  document.getElementById('uploadModal').classList.add('open');
+}
+function updateSubCatOptions(){
+  const cat = document.getElementById('upCat').value;
+  const subSelect = document.getElementById('upSubCat');
+  const sub2Select = document.getElementById('upSubCat2');
+  const subs = CATEGORY_TREE[cat] ? CATEGORY_TREE[cat].children : [];
+  if (subs.length === 0) {
+    subSelect.innerHTML = '<option value="">（无）</option>';
+    subSelect.disabled = true;
+    sub2Select.innerHTML = '<option value="">（无）</option>';
+    sub2Select.disabled = true;
+    return;
+  }
+  subSelect.disabled = false;
+  subSelect.innerHTML = '<option value="">不指定</option>' +
+    subs.map(s => `<option value="${s.name}">${s.name}</option>`).join('');
+  updateSubCat2Options();
+}
+function updateSubCat2Options(){
+  const cat = document.getElementById('upCat').value;
+  const subName = document.getElementById('upSubCat').value;
+  const sub2Select = document.getElementById('upSubCat2');
+  if (!subName) {
+    sub2Select.innerHTML = '<option value="">（无）</option>';
+    sub2Select.disabled = true;
+    return;
+  }
+  const sub = findSub(cat, subName);
+  if (!sub || !sub.children || sub.children.length === 0) {
+    sub2Select.innerHTML = '<option value="">（无）</option>';
+    sub2Select.disabled = true;
+    return;
+  }
+  sub2Select.disabled = false;
+  sub2Select.innerHTML = '<option value="">不指定</option>' +
+    sub.children.map(c => `<option value="${c}">${c}</option>`).join('');
+}
+function closeUpload(){ document.getElementById('uploadModal').classList.remove('open'); }
+function updateThemePreview(){
+  const cat = document.getElementById('upCat').value;
+  const theme = getCategoryColor(cat);
+  const preview = document.getElementById('themePreview');
+  preview.style.setProperty('--bg-start', theme.bgStart);
+  preview.style.setProperty('--bg-mid', theme.bgMid);
+  preview.style.setProperty('--bg-end', theme.bgEnd);
+  preview.style.setProperty('--accent', theme.accent);
+  const title = document.getElementById('upTitle').value || '书名';
+  const sub = document.getElementById('upSub').value || '副标题';
+  preview.innerHTML = `预览：<em>${escapeHtml(title)}</em> · ${escapeHtml(sub)}`;
+}
+async function submitUpload(){
+  const title = document.getElementById('upTitle').value.trim();
+  if (!title) { toast('请填写书名'); return; }
+  const author = document.getElementById('upAuthor').value.trim();
+  const category = document.getElementById('upCat').value;
+  const subcategory = document.getElementById('upSubCat').value || '';
+  const subcategory2 = document.getElementById('upSubCat2').value || '';
+  const bookTag = document.getElementById('upTag').value.trim();
+  const subtitle = document.getElementById('upSub').value.trim();
+  const quote = document.getElementById('upQuote').value.trim();
+  const noteFile = document.getElementById('upNote').files[0];
+  const axesFile = document.getElementById('upAxes').files[0];
+  if (!noteFile && !axesFile) { toast('请至少上传一个文件'); return; }
+  const id = 'user-' + Date.now();
+  const catColor = getCategoryColor(category);
+  const theme = {
+    bgStart: catColor.bgStart, bgMid: catColor.bgMid, bgEnd: catColor.bgEnd,
+    accent: catColor.accent, glow: 'rgba(255,255,255,.08)',
+  };
+  const record = {
+    id, title, titleHtml: escapeHtml(title),
+    author, category, subcategory, subcategory2,
+    bookTag, subtitle, quote, theme,
+    noteContent: noteFile ? await noteFile.text() : null,
+    axesContent: axesFile ? await axesFile.text() : null,
+  };
+  await dbPut(record);
+  allBooks.push({ ...record, isBuiltin: false });
+  closeUpload();
+  renderNav(); render(); updateStats();
+  if (currentView === 'tree') renderMindMap();
+  toast(`已添加《${title}》`);
+}
+
+/* =====================================================================
+   16. 删除
+   ===================================================================== */
+async function deleteBook(id){
+  const book = allBooks.find(b => b.id === id);
+  if (!book) return;
+  if (!confirm(`确定删除《${book.title}》吗？`)) return;
+  if (book.isBuiltin) {
+    if (!hiddenBuiltins.includes(id)) {
+      hiddenBuiltins.push(id);
+      localStorage.setItem('library-hidden', JSON.stringify(hiddenBuiltins));
+    }
+    book.hidden = true;
+    try { await dbDelete(id); } catch(e) {}
+  } else {
+    await dbDelete(id);
+    const idx = allBooks.findIndex(b => b.id === id);
+    if (idx >= 0) allBooks.splice(idx, 1);
+  }
+  renderNav(); render(); updateStats();
+  if (currentView === 'tree') renderMindMap();
+  toast('已删除');
+}
+
+/* =====================================================================
+   17. 导入导出
+   ===================================================================== */
+async function exportBackup(){
+  const uploaded = allBooks.filter(b => !b.isBuiltin);
+  const data = {
+    version: 3, exportedAt: new Date().toISOString(),
+    hidden: hiddenBuiltins,
+    books: uploaded.map(b => ({
+      id: b.id, title: b.title, titleHtml: b.titleHtml,
+      author: b.author, category: b.category,
+      subcategory: b.subcategory, subcategory2: b.subcategory2,
+      bookTag: b.bookTag, subtitle: b.subtitle, quote: b.quote, theme: b.theme,
+      noteContent: b.noteContent, axesContent: b.axesContent,
+    })),
+  };
+  const blob = new Blob([JSON.stringify(data, null, 2)], { type: 'application/json' });
+  const url = URL.createObjectURL(blob);
+  const a = document.createElement('a');
+  a.href = url;
+  a.download = `图书馆备份-${new Date().toISOString().slice(0,10)}.json`;
+  a.click();
+  URL.revokeObjectURL(url);
+  toast('备份已导出');
+}
+async function importBackup(file){
+  try {
+    const text = await file.text();
+    const data = JSON.parse(text);
+    if (!data.books || !Array.isArray(data.books)) throw new Error('格式不对');
+    let count = 0;
+    for (const b of data.books) { await dbPut(b); count++; }
+    if (data.hidden && Array.isArray(data.hidden)) {
+      hiddenBuiltins = data.hidden;
+      localStorage.setItem('library-hidden', JSON.stringify(hiddenBuiltins));
+    }
+    const uploaded = await dbGetAll();
+    allBooks = [
+      ...BUILTIN_BOOKS.map((b, i) => ({
+        id: 'builtin-' + i, ...b, isBuiltin: true,
+        noteContent: null, axesContent: null,
+      })),
+      ...uploaded.map(b => ({ ...b, isBuiltin: false })),
+    ];
+    renderNav(); render(); updateStats();
+    if (currentView === 'tree') renderMindMap();
+    toast(`已导入 ${count} 本书`);
+  } catch(e) { toast('导入失败：' + e.message); }
+}
+
+/* =====================================================================
+   18. 事件绑定
+   ===================================================================== */
+function bindEvents(){
+  document.getElementById('searchInput').addEventListener('input', e => {
+    currentSearch = e.target.value;
+    render();
+    if (currentView === 'tree') renderMindMap();
+  });
+  document.getElementById('navMain').addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    currentCat = btn.dataset.cat;
+    currentSubCat = null; currentSubCat2 = null;
+    renderNav(); render();
+    if (currentView === 'tree') renderMindMap();
+  });
+  document.getElementById('navSub').addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    currentSubCat = btn.dataset.subcat || null;
+    currentSubCat2 = null;
+    renderNav(); render();
+    if (currentView === 'tree') renderMindMap();
+  });
+  document.getElementById('navDeep').addEventListener('click', e => {
+    const btn = e.target.closest('.cat-btn');
+    if (!btn) return;
+    currentSubCat2 = btn.dataset.subcat2 || null;
+    renderNav(); render();
+    if (currentView === 'tree') renderMindMap();
+  });
+  document.getElementById('main').addEventListener('click', e => {
+    const del = e.target.closest('.card-del');
+    if (del) { e.stopPropagation(); deleteBook(del.dataset.del); return; }
+    const card = e.target.closest('.book-card');
+    if (card) openBook(card.dataset.id);
+  });
+  document.getElementById('modalClose').addEventListener('click', () => {
+    document.getElementById('modal').classList.remove('open');
+    document.getElementById('modalBody').innerHTML = '';
+  });
+  document.querySelectorAll('.modal-tab').forEach(tab => {
+    tab.addEventListener('click', () => {
+      currentTab = tab.dataset.tab;
+      document.querySelectorAll('.modal-tab').forEach(t => {
+        t.classList.toggle('active', t === tab);
+      });
+      renderModalBody();
+    });
+  });
+  document.getElementById('addBtn').addEventListener('click', openUpload);
+  document.getElementById('upCancel').addEventListener('click', closeUpload);
+  document.getElementById('upSubmit').addEventListener('click', submitUpload);
+  document.getElementById('upCat').addEventListener('change', () => {
+    updateSubCatOptions();
+    updateThemePreview();
+  });
+  document.getElementById('upSubCat').addEventListener('change', updateSubCat2Options);
+  document.getElementById('upTitle').addEventListener('input', updateThemePreview);
+  document.getElementById('upSub').addEventListener('input', updateThemePreview);
+  document.getElementById('exportBtn').addEventListener('click', exportBackup);
+  document.getElementById('importBtn').addEventListener('click', () => {
+    document.getElementById('importFile').click();
+  });
+  document.getElementById('importFile').addEventListener('change', e => {
+    if (e.target.files[0]) importBackup(e.target.files[0]);
+    e.target.value = '';
+  });
+  document.getElementById('treeBtn').addEventListener('click', () => {
+    showTreeView();
+    setupMapInteraction();
+  });
+  document.getElementById('treeBackBtn').addEventListener('click', showGridView);
+  document.addEventListener('keydown', e => {
+    if (e.key === 'Escape') {
+      if (document.getElementById('modal').classList.contains('open')) {
+        document.getElementById('modal').classList.remove('open');
+        document.getElementById('modalBody').innerHTML = '';
+      } else if (document.getElementById('uploadModal').classList.contains('open')) {
+        closeUpload();
+      } else if (currentView === 'tree') {
+        showGridView();
+      }
+    }
+  });
+}
+
+/* =====================================================================
+   19. Toast
+   ===================================================================== */
+let toastTimer;
+function toast(msg){
+  const el = document.getElementById('toast');
+  el.textContent = msg;
+  el.classList.add('show');
+  clearTimeout(toastTimer);
+  toastTimer = setTimeout(() => el.classList.remove('show'), 2200);
+}
+
+/* =====================================================================
+   20. 启动
+   ===================================================================== */
+init().catch(err => {
+  console.error(err);
+  document.getElementById('main').innerHTML =
+    `<div style="text-align:center;padding:60px;color:#b91c1c">
+      载入失败：${err.message}<br>
+      <small style="color:#6f6a63">如果是在 file:// 下打开，请改用本地服务器</small>
+    </div>`;
+});
+</script>
+
+
+</body></html>
